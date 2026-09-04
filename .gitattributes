@@ -1,0 +1,9 @@
+# Normaliza quebras de linha no repositorio, evitando diffs ruidosos entre
+# quem trabalha em Windows e a execucao do CI em Linux.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.gif binary
+*.webm binary
+*.zip binary
