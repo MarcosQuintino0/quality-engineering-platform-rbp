@@ -109,7 +109,7 @@ olhasse o status.
 
 | Cenario             | Quando                                             |
 | ------------------- | -------------------------------------------------- |
-| PERF-001 smoke      | regressao programada e execucao manual             |
+| PERF-001 smoke      | regressao estendida e execucao manual              |
 | PERF-002 a PERF-005 | apenas execucao manual, com parametros controlados |
 
 Stress, pico e soak nunca sao acionados automaticamente. Sao caros, e um

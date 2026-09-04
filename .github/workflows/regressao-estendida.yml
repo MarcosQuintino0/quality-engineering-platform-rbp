@@ -1,11 +1,13 @@
-name: Regressao programada
+name: Regressao estendida
 
-# Roda de madrugada, quando ninguem espera por ela, e faz o que nao cabe no
-# ciclo de feedback de um pull request: segundo navegador, analise de
-# instabilidade e carga leve.
+# Faz o que nao cabe no ciclo de feedback de um pull request: segundo
+# navegador, analise de instabilidade e carga leve.
+#
+# Acionada apenas sob demanda. Este repositorio e um portfolio, e nao um
+# sistema em operacao: uma execucao diaria automatica consumiria minutos de CI
+# sem ninguem para ler o resultado. Em um projeto real, o gatilho natural aqui
+# seria um cron noturno.
 on:
-  schedule:
-    - cron: '0 4 * * *'
   workflow_dispatch:
 
 permissions:
@@ -39,7 +41,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: evidencias-programada
+          name: evidencias-estendida
           path: |
             test-results/
             playwright-report/

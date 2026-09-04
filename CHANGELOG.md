@@ -46,7 +46,7 @@ Primeira versão completa da plataforma de testes.
 
 - Verificação de pull request com gates estáticos e cenários críticos.
 - Regressão completa no push para `main`, com Allure publicado no GitHub Pages.
-- Regressão programada com Firefox, análise de instabilidade e k6 smoke.
+- Regressão estendida, sob demanda, com Firefox, análise de instabilidade e k6 smoke.
 - Execução manual de performance com cenário e duração parametrizados.
 - Dependabot semanal com agrupamento de dependências relacionadas.
 

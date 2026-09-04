@@ -120,9 +120,9 @@ flowchart TD
     Allure --> Pages["Publica no GitHub Pages"]
     Full -->|falha| Eva["Publica trace, screenshot,<br/>vídeo e logs"]
 
-    Cron["Agendado, 04:00"] --> Reg["Catálogo + Firefox"]
-    Cron --> Flk["3 execuções sem retry"]
-    Cron --> K6["k6 smoke"]
+    Ext["Regressão estendida<br/>sob demanda"] --> Reg["Catálogo + Firefox"]
+    Ext --> Flk["3 execuções sem retry"]
+    Ext --> K6["k6 smoke"]
 
     Man["Acionamento manual"] --> Perf["Cenário e duração<br/>escolhidos na hora"]
 ```

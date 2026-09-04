@@ -1,3 +1,17 @@
+# Configuracao do Dependabot, deliberadamente pausada.
+#
+# Este repositorio e um portfolio, e nao um sistema em operacao. Os numeros do
+# README — 30 cenarios aprovados, tempos de execucao, baseline de performance —
+# foram medidos com as versoes exatas fixadas no package-lock.json. Deixar o
+# Dependabot abrir pull requests semanais faria as dependencias divergirem
+# dessas medicoes sem ninguem para revisar e reexecutar, e o relatorio passaria
+# a descrever um estado que nao existe mais.
+#
+# "open-pull-requests-limit: 0" desativa as atualizacoes de versao mantendo a
+# configuracao visivel e valida: o agrupamento e as regras de compatibilidade
+# abaixo continuam documentados e voltam a valer trocando o limite por um numero
+# maior que zero. Atualizacoes de seguranca continuam ativas pelas configuracoes
+# do repositorio, independentemente deste limite.
 version: 2
 updates:
   - package-ecosystem: npm
@@ -5,7 +19,8 @@ updates:
     schedule:
       interval: weekly
       day: monday
-    open-pull-requests-limit: 5
+    # Pausado: ver a explicacao no topo do arquivo.
+    open-pull-requests-limit: 0
     groups:
       # Playwright e seus complementos sobem juntos: atualizar o executor sem o
       # reporter costuma quebrar a geracao do relatorio.
@@ -36,5 +51,7 @@ updates:
     schedule:
       interval: weekly
       day: monday
+    # Pausado pelo mesmo motivo.
+    open-pull-requests-limit: 0
     commit-message:
       prefix: ci

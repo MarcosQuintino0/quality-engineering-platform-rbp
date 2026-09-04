@@ -54,7 +54,7 @@ depois de a causa ser conhecida e registrada, e nunca como primeira reacao.
 
 6. **Quarentena, quando necessario.** Se a causa nao puder ser corrigida na
    hora, o cenario recebe a anotacao `@quarentena` e sai da execucao que
-   bloqueia merge, continuando a rodar na regressao programada.
+   bloqueia merge, continuando a rodar na regressao estendida.
 
 7. **Quarentena e visivel.** Testes em quarentena aparecem no relatorio e no
    README. Quarentena silenciosa e o mesmo que teste apagado.

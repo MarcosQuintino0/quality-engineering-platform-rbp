@@ -127,4 +127,4 @@ nao sao cobertos. Exigem ferramental e autorizacao propria, e testes desse tipo
 jamais devem rodar contra a instancia publica.
 
 **Compatibilidade entre navegadores.** Chromium e o alvo padrao; Firefox roda em
-regressao programada. Safari e navegadores moveis nao sao cobertos.
+regressao estendida. Safari e navegadores moveis nao sao cobertos.

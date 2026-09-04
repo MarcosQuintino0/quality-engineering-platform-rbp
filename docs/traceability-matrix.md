@@ -12,7 +12,7 @@ por que este teste existe, e o que fica descoberto se ele for removido.
 | ----- | --------------------------- |
 | PR    | verificacao de pull request |
 | MAIN  | push na branch principal    |
-| REG   | regressao programada        |
+| REG   | regressao estendida         |
 
 Os riscos (R1 a R8) estao definidos em [risk-matrix.md](risk-matrix.md).
 

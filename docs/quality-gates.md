@@ -26,7 +26,7 @@ as camadas mais caras raramente quebram sozinhas.
 | Geração do Allure          | publicação | Relatório que não gera é relatório que ninguém lê               |
 | Publicação no Pages        | —          | Falha aqui não invalida os testes, mas é registrada             |
 
-## Na regressão programada
+## Na regressão estendida
 
 | Verificação                           | Ação em caso de falha  | Motivo                                                     |
 | ------------------------------------- | ---------------------- | ---------------------------------------------------------- |
