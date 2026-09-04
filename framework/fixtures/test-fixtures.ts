@@ -1,4 +1,4 @@
-import { test as base, type APIRequestContext } from '@playwright/test';
+import { test as base, type APIRequestContext, type Page } from '@playwright/test';
 
 import { AuthClient, BookingClient, MessageClient, RoomClient } from '../api-clients';
 import { ResourceTracker } from '../cleanup/resource-tracker';
@@ -16,15 +16,24 @@ export interface TestFixtures {
   /**
    * Token administrativo compartilhado pelo worker.
    *
-   * Cenarios que precisam invalidar a sessao devem abrir a propria sessao com
-   * "novaSessao", para nao derrubar o token usado pelos demais testes do mesmo
-   * worker.
+   * Cenarios que precisam invalidar a sessao devem abrir a propria com
+   * "novaSessao", para nao derrubar o token usado pelos demais testes do
+   * mesmo worker.
    */
   adminToken: string;
   /** Abre uma sessao independente, descartavel pelo proprio teste. */
   novaSessao: () => Promise<string>;
   /** Recursos criados pelo teste, removidos automaticamente no teardown. */
   recursos: ResourceTracker;
+  /**
+   * Pagina ja autenticada na administracao.
+   *
+   * A sessao e injetada como cookie em vez de passar pela tela de login. O
+   * login pela interface e o objeto de QEP-017 e QEP-018; repeti-lo nos
+   * cenarios de cadastro so acrescentaria tempo e um ponto de falha alheio ao
+   * que esta sendo verificado.
+   */
+  paginaAdmin: Page;
 }
 
 export interface WorkerFixtures {
@@ -55,7 +64,7 @@ async function autenticar(request: APIRequestContext): Promise<string> {
 
 export const test = base.extend<TestFixtures, WorkerFixtures>({
   // Uma sessao administrativa por worker: evita um login por teste sem criar
-  // dependencia entre testes, ja que o token e apenas credencial, nao estado.
+  // dependencia entre testes, ja que o token e credencial, nao estado.
   workerToken: [
     async ({ playwright }, use) => {
       const request = await playwright.request.newContext();
@@ -83,6 +92,14 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
 
   novaSessao: async ({ request }, use) => {
     await use(() => autenticar(request));
+  },
+
+  paginaAdmin: async ({ page, context, adminToken }, use) => {
+    const { hostname } = new URL(environment.baseUrl);
+    await context.addCookies([
+      { name: 'token', value: adminToken, domain: hostname, path: '/' },
+    ]);
+    await use(page);
   },
 
   recursos: async ({ clients, adminToken }, use, testInfo) => {
