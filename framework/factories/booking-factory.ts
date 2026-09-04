@@ -34,7 +34,10 @@ export function buildStayDates(nights = 2): BookingDates {
  * SUT: firstname entre 3 e 18 caracteres, lastname entre 3 e 30 e telefone
  * entre 11 e 21 caracteres.
  */
-export function buildBooking(roomId: number, overrides: Partial<BookingPayload> = {}): BookingPayload {
+export function buildBooking(
+  roomId: number,
+  overrides: Partial<BookingPayload> = {},
+): BookingPayload {
   const faker = createFaker();
   const suffix = testLabel('B').slice(-6);
 

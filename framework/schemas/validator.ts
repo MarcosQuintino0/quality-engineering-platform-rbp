@@ -17,7 +17,10 @@ export interface ContractResult {
  * de falha com todos os desvios de contrato de uma vez, em vez de parar no
  * primeiro.
  */
-export function validateContract(schema: Schema | JSONSchemaType<unknown>, data: unknown): ContractResult {
+export function validateContract(
+  schema: Schema | JSONSchemaType<unknown>,
+  data: unknown,
+): ContractResult {
   const validate = ajv.compile(schema);
   const valid = validate(data);
 

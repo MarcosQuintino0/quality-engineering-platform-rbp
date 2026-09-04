@@ -67,7 +67,13 @@ export class ResourceTracker {
 
         // 404 significa que o proprio teste ja removeu o recurso, o que e um
         // resultado valido de limpeza e nao uma falha.
-        if (status === 200 || status === 201 || status === 202 || status === 204 || status === 404) {
+        if (
+          status === 200 ||
+          status === 201 ||
+          status === 202 ||
+          status === 204 ||
+          status === 404
+        ) {
           report.removed.push(resource);
         } else {
           report.failed.push({ ...resource, reason: `status ${status}` });

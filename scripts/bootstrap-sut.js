@@ -15,6 +15,15 @@ const ROOT = path.resolve(__dirname, '..');
 const SUT_DIR = path.join(ROOT, '.sut', 'restful-booker-platform');
 const VERSION = JSON.parse(fs.readFileSync(path.join(__dirname, 'sut-version.json'), 'utf8'));
 
+/**
+ * Cache de dependencias Maven.
+ *
+ * E um diretorio do host, e nao um volume Docker nomeado, para que o CI possa
+ * restaura-lo entre execucoes: um volume viveria apenas dentro do runner e a
+ * compilacao baixaria tudo de novo a cada pipeline.
+ */
+const M2_DIR = process.env.M2_DIR || path.join(ROOT, '.m2');
+
 /** Modulos Java necessarios. O frontend (assets) e compilado pelo proprio Dockerfile. */
 const JAVA_MODULES = ['auth', 'booking', 'room', 'report', 'branding', 'message'];
 
@@ -54,15 +63,25 @@ function buildJars() {
     return;
   }
 
+  fs.mkdirSync(M2_DIR, { recursive: true });
   log(`Compilando os modulos Java em ${VERSION.mavenImage} (pode demorar na primeira execucao).`);
   run('docker', [
-    'run', '--rm',
-    '-v', `${SUT_DIR}:/app`,
-    '-v', 'rbp-m2:/root/.m2',
-    '-w', '/app',
+    'run',
+    '--rm',
+    '-v',
+    `${SUT_DIR}:/app`,
+    '-v',
+    `${M2_DIR}:/root/.m2`,
+    '-w',
+    '/app',
     VERSION.mavenImage,
-    'mvn', '-B', '-DskipTests', 'clean', 'install',
-    '-pl', JAVA_MODULES.join(','),
+    'mvn',
+    '-B',
+    '-DskipTests',
+    'clean',
+    'install',
+    '-pl',
+    JAVA_MODULES.join(','),
   ]);
 
   if (!jarsPresent()) {

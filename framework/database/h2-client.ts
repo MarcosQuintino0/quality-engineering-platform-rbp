@@ -10,6 +10,9 @@ const H2_VERSION = '2.4.240';
 const JDK_IMAGE = 'eclipse-temurin:26-jdk';
 const TOOL_DIR = path.resolve(__dirname, '..', '..', 'tools', 'db-query');
 
+/** Mesmo cache Maven usado pelo bootstrap, de onde vem o driver H2. */
+const M2_DIR = process.env['M2_DIR'] ?? path.resolve(__dirname, '..', '..', '.m2');
+
 /**
  * Acesso somente leitura aos bancos H2 do SUT.
  *
@@ -42,13 +45,17 @@ export class H2Client {
     const output = execFileSync(
       'docker',
       [
-        'run', '--rm',
+        'run',
+        '--rm',
         '--add-host=host.docker.internal:host-gateway',
-        '-v', `${TOOL_DIR}:/tools:ro`,
-        '-v', 'rbp-m2:/root/.m2:ro',
+        '-v',
+        `${TOOL_DIR}:/tools:ro`,
+        '-v',
+        `${M2_DIR}:/root/.m2:ro`,
         JDK_IMAGE,
         'java',
-        '-cp', `/root/.m2/repository/com/h2database/h2/${H2_VERSION}/h2-${H2_VERSION}.jar`,
+        '-cp',
+        `/root/.m2/repository/com/h2database/h2/${H2_VERSION}/h2-${H2_VERSION}.jar`,
         '/tools/DbQuery.java',
         this.jdbcUrl(),
         environment.database.user,

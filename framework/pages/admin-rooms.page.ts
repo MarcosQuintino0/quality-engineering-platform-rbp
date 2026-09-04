@@ -27,9 +27,11 @@ export class AdminRoomsPage {
   }
 
   /** Preenche e submete o formulario de novo quarto. */
-  async criarQuarto(quarto: Pick<RoomPayload, 'roomName' | 'type' | 'accessible' | 'roomPrice'> & {
-    features?: string[];
-  }): Promise<void> {
+  async criarQuarto(
+    quarto: Pick<RoomPayload, 'roomName' | 'type' | 'accessible' | 'roomPrice'> & {
+      features?: string[];
+    },
+  ): Promise<void> {
     await this.nome.fill(quarto.roomName);
     await this.tipo.selectOption(quarto.type);
     await this.acessivel.selectOption(String(quarto.accessible));

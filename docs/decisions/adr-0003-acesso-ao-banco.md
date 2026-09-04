@@ -31,8 +31,7 @@ precisa ser ligado por variavel de ambiente.
 
 ## Decisao
 
-1. O `docker-compose.yml` define `dbServer=true` e publica as portas 9090 a
-   9094. Nenhuma linha do codigo do SUT e alterada.
+1. O `docker-compose.yml` define `dbServer=true` e publica as portas 9090 a 9094. Nenhuma linha do codigo do SUT e alterada.
 2. As consultas passam por `tools/db-query/DbQuery.java`, um programa de
    arquivo unico executado com o lancador de fonte do Java, dentro de um
    container `eclipse-temurin:26-jdk`.

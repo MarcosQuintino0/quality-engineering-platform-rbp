@@ -10,7 +10,11 @@ import type { ApiResponse } from '../api-clients';
  * uma segunda execucao com log para descobrir o motivo. O corpo quase sempre
  * traz a causa, entao ele faz parte da mensagem desde a primeira falha.
  */
-export function esperarStatus(resposta: ApiResponse<unknown>, esperado: number, contexto: string): void {
+export function esperarStatus(
+  resposta: ApiResponse<unknown>,
+  esperado: number,
+  contexto: string,
+): void {
   expect(
     resposta.status,
     `${contexto}: esperado HTTP ${esperado}, recebido ${resposta.status}. Corpo: ${resumir(resposta.raw)}`,

@@ -38,14 +38,14 @@ depois de a causa ser conhecida e registrada, e nunca como primeira reacao.
 
 4. **Classificar a causa** em uma destas categorias:
 
-   | Categoria | Significado |
-   | --- | --- |
-   | produto | defeito real do SUT |
-   | ambiente | infraestrutura, rede, container, recurso da maquina |
-   | dado | massa compartilhada, colisao entre testes, residuo de execucao |
-   | sincronizacao | o teste agiu antes de o sistema estar pronto |
-   | contrato | a resposta mudou de forma |
-   | teste | erro de logica, seletor ou assercao do proprio teste |
+   | Categoria     | Significado                                                    |
+   | ------------- | -------------------------------------------------------------- |
+   | produto       | defeito real do SUT                                            |
+   | ambiente      | infraestrutura, rede, container, recurso da maquina            |
+   | dado          | massa compartilhada, colisao entre testes, residuo de execucao |
+   | sincronizacao | o teste agiu antes de o sistema estar pronto                   |
+   | contrato      | a resposta mudou de forma                                      |
+   | teste         | erro de logica, seletor ou assercao do proprio teste           |
 
 5. **Corrigir na causa.** Sincronizacao se resolve com estado observavel, nunca
    com espera fixa. Dado se resolve com massa propria por teste. Produto vira

@@ -12,7 +12,10 @@ export interface AuthCookieContractResult {
  * contrato aqui e sobre o cabecalho, e nao sobre um schema de corpo. A decisao
  * esta registrada em docs/decisions/adr-0002-contrato-de-autenticacao.md.
  */
-export function authCookieContract(headers: Record<string, string>, body: string): AuthCookieContractResult {
+export function authCookieContract(
+  headers: Record<string, string>,
+  body: string,
+): AuthCookieContractResult {
   const errors: string[] = [];
 
   if (body.trim() !== '') {

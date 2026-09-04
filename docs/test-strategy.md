@@ -20,15 +20,15 @@ allowlist de hosts no codigo recusa esse uso.
 
 ## Distribuicao por camada
 
-| Camada | Cenarios | Proporcao |
-| --- | --- | --- |
-| API | QEP-001 a QEP-012 | 12 |
-| Contrato | QEP-013 a QEP-016 | 4 |
-| Interface | QEP-017 a QEP-025 | 9 |
-| Integracao entre camadas | QEP-026, QEP-027 | 2 |
-| Persistencia em banco | QEP-028, QEP-029 | 2 |
-| Acessibilidade | QEP-030 | 1 |
-| **Total** | | **30** |
+| Camada                   | Cenarios          | Proporcao |
+| ------------------------ | ----------------- | --------- |
+| API                      | QEP-001 a QEP-012 | 12        |
+| Contrato                 | QEP-013 a QEP-016 | 4         |
+| Interface                | QEP-017 a QEP-025 | 9         |
+| Integracao entre camadas | QEP-026, QEP-027  | 2         |
+| Persistencia em banco    | QEP-028, QEP-029  | 2         |
+| Acessibilidade           | QEP-030           | 1         |
+| **Total**                |                   | **30**    |
 
 A forma segue a piramide: a base em API, onde o teste e rapido, estavel e
 aponta o servico culpado, e o topo estreito em interface, onde o teste e caro e

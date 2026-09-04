@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.sut/
+.m2/
+allure-report/
+allure-results/
+playwright-report/
+test-results/
+performance/results/raw/
+package-lock.json

@@ -81,13 +81,21 @@ export class HttpClient {
     return envelope<T>(await this.request.get(this.url(suffix), toPlaywright(options)));
   }
 
-  async post<T>(suffix: string, data: unknown, options: RequestOptions = {}): Promise<ApiResponse<T>> {
+  async post<T>(
+    suffix: string,
+    data: unknown,
+    options: RequestOptions = {},
+  ): Promise<ApiResponse<T>> {
     const config = toPlaywright(options);
     if (options.rawBody === undefined) config['data'] = data;
     return envelope<T>(await this.request.post(this.url(suffix), config));
   }
 
-  async put<T>(suffix: string, data: unknown, options: RequestOptions = {}): Promise<ApiResponse<T>> {
+  async put<T>(
+    suffix: string,
+    data: unknown,
+    options: RequestOptions = {},
+  ): Promise<ApiResponse<T>> {
     const config = toPlaywright(options);
     if (options.rawBody === undefined) config['data'] = data;
     return envelope<T>(await this.request.put(this.url(suffix), config));

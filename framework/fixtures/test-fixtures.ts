@@ -96,16 +96,15 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
 
   paginaAdmin: async ({ page, context, adminToken }, use) => {
     const { hostname } = new URL(environment.baseUrl);
-    await context.addCookies([
-      { name: 'token', value: adminToken, domain: hostname, path: '/' },
-    ]);
+    await context.addCookies([{ name: 'token', value: adminToken, domain: hostname, path: '/' }]);
     await use(page);
   },
 
   recursos: async ({ clients, adminToken }, use, testInfo) => {
     const tracker = new ResourceTracker(
       { rooms: clients.rooms, bookings: clients.bookings, messages: clients.messages },
-      async () => adminToken,
+      // Sem async: nao ha nada a aguardar, o token ja esta resolvido.
+      () => Promise.resolve(adminToken),
     );
 
     await use(tracker);

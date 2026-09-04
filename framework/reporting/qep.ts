@@ -20,10 +20,12 @@ export interface Rastreabilidade {
  * permite ligar uma falha ao risco correspondente sem consultar planilha.
  */
 export function rastrear(info: Rastreabilidade): void {
-  test.info().annotations.push(
-    { type: 'id', description: info.id },
-    { type: 'camada', description: info.camada },
-    { type: 'risco', description: info.risco },
-    { type: 'requisito', description: info.requisito },
-  );
+  test
+    .info()
+    .annotations.push(
+      { type: 'id', description: info.id },
+      { type: 'camada', description: info.camada },
+      { type: 'risco', description: info.risco },
+      { type: 'requisito', description: info.requisito },
+    );
 }

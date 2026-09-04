@@ -24,11 +24,19 @@ const projects: Project[] = [
   { name: 'ui-chromium', testDir: './tests/ui', use: { ...devices['Desktop Chrome'] } },
   { name: 'integration', testDir: './tests/integration', use: { ...devices['Desktop Chrome'] } },
   { name: 'database', testDir: './tests/database', use: { ...devices['Desktop Chrome'] } },
-  { name: 'accessibility', testDir: './tests/accessibility', use: { ...devices['Desktop Chrome'] } },
+  {
+    name: 'accessibility',
+    testDir: './tests/accessibility',
+    use: { ...devices['Desktop Chrome'] },
+  },
 ];
 
 if (includeFirefox) {
-  projects.push({ name: 'ui-firefox', testDir: './tests/ui', use: { ...devices['Desktop Firefox'] } });
+  projects.push({
+    name: 'ui-firefox',
+    testDir: './tests/ui',
+    use: { ...devices['Desktop Firefox'] },
+  });
 }
 
 export default defineConfig({

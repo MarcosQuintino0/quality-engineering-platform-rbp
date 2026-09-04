@@ -23,9 +23,7 @@ export class AdminRoomDetailsPage {
   async abrir(roomId: number): Promise<void> {
     this.roomId = roomId;
     await this.page.goto(`/admin/room/${roomId}`);
-    await this.page
-      .getByRole('heading', { name: /^Room: \S+/ })
-      .waitFor({ state: 'visible' });
+    await this.page.getByRole('heading', { name: /^Room: \S+/ }).waitFor({ state: 'visible' });
   }
 
   async entrarEmEdicao(): Promise<void> {
@@ -33,7 +31,11 @@ export class AdminRoomDetailsPage {
     await this.botaoAtualizar.waitFor({ state: 'visible' });
   }
 
-  async alterar(campos: { roomPrice?: number; type?: string; description?: string }): Promise<void> {
+  async alterar(campos: {
+    roomPrice?: number;
+    type?: string;
+    description?: string;
+  }): Promise<void> {
     if (campos.roomPrice !== undefined) {
       await this.page.locator('#roomPrice').fill(String(campos.roomPrice));
     }

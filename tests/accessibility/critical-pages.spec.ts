@@ -48,7 +48,10 @@ test.describe('Acessibilidade', () => {
     // da administracao. Sao as telas onde uma barreira impede a tarefa inteira.
     const paginas = [
       { nome: 'Home', url: '/' },
-      { nome: 'Reserva do quarto', url: `/reservation/${quarto.body.roomid}?${parametros.toString()}` },
+      {
+        nome: 'Reserva do quarto',
+        url: `/reservation/${quarto.body.roomid}?${parametros.toString()}`,
+      },
       { nome: 'Login administrativo', url: '/admin' },
     ];
 

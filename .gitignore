@@ -30,3 +30,6 @@ Thumbs.db
 
 # Codigo-fonte do SUT clonado pelo bootstrap (dependencia externa, nao versionada)
 .sut/
+
+# Cache local de dependencias Maven, populado pelo bootstrap do SUT
+.m2/

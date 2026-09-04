@@ -90,7 +90,10 @@ test.describe('Persistencia em banco', () => {
     recursos.track('booking', segunda.body.bookingid);
 
     expect(
-      bookingDb.byRoomId(roomid).map((linha) => linha.BOOKINGID).sort(),
+      bookingDb
+        .byRoomId(roomid)
+        .map((linha) => linha.BOOKINGID)
+        .sort(),
       'as duas reservas criadas deveriam estar no banco',
     ).toEqual([primeira.body.bookingid, segunda.body.bookingid].sort());
 

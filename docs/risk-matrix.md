@@ -14,15 +14,16 @@ exibir uma descricao de quarto errada. A matriz abaixo reflete isso.
 **Probabilidade** — chance de o defeito existir ou reaparecer, considerando a
 complexidade da regra e quantas partes do sistema ela atravessa.
 
-| | Impacto baixo | Impacto medio | Impacto alto |
-| --- | --- | --- | --- |
-| **Probabilidade alta** | medio | alto | **critico** |
-| **Probabilidade media** | baixo | medio | alto |
-| **Probabilidade baixa** | baixo | baixo | medio |
+|                         | Impacto baixo | Impacto medio | Impacto alto |
+| ----------------------- | ------------- | ------------- | ------------ |
+| **Probabilidade alta**  | medio         | alto          | **critico**  |
+| **Probabilidade media** | baixo         | medio         | alto         |
+| **Probabilidade baixa** | baixo         | baixo         | medio        |
 
 ## Riscos
 
 ### R1 — Sessao administrativa pode ser burlada
+
 **Impacto:** alto. **Probabilidade:** media. **Classificacao:** alto.
 
 A autenticacao separa quem so pode reservar de quem pode alterar precos, quartos
@@ -36,6 +37,7 @@ central. Cada endpoint novo e uma oportunidade de esquecer a verificacao.
 **Cobertura:** QEP-001, QEP-002, QEP-003, QEP-013, QEP-017, QEP-018.
 
 ### R2 — Reserva e perdida ou gravada incorretamente
+
 **Impacto:** alto. **Probabilidade:** alta. **Classificacao:** critico.
 
 E a transacao que da receita ao negocio. O caminho atravessa frontend, BFF,
@@ -48,6 +50,7 @@ A verificacao em banco existe por causa deste risco: confirmar uma escrita pela
 mesma API que a fez e circular e nao prova persistencia.
 
 ### R3 — Disponibilidade calculada errado gera overbooking
+
 **Impacto:** alto. **Probabilidade:** media. **Classificacao:** alto.
 
 A regra de conflito de datas e a unica logica de negocio nao trivial do sistema.
@@ -59,6 +62,7 @@ propria reserva como conflito ao atualiza-la. Ver `docs/known-issues.md`.
 **Cobertura:** QEP-009, QEP-010, QEP-024, PERF-003.
 
 ### R4 — Contrato de API quebra sem aviso
+
 **Impacto:** alto. **Probabilidade:** media. **Classificacao:** alto.
 
 A plataforma tem seis servicos que se consomem mutuamente, e o frontend depende
@@ -68,6 +72,7 @@ continua chegando com status 200 e o campo esperado some.
 **Cobertura:** QEP-013, QEP-014, QEP-015, QEP-016.
 
 ### R5 — Exclusao deixa dados orfaos ou falha silenciosamente
+
 **Impacto:** medio. **Probabilidade:** media. **Classificacao:** medio.
 
 Excluir um quarto que possui reservas e excluir uma reserva sao operacoes que
@@ -79,6 +84,7 @@ devolvendo 500.
 **Cobertura:** QEP-007, QEP-011, QEP-021, QEP-029.
 
 ### R6 — Interface administrativa impede a operacao diaria
+
 **Impacto:** medio. **Probabilidade:** alta. **Classificacao:** alto.
 
 Quem opera o hotel trabalha pela interface. Um formulario que nao salva bloqueia
@@ -87,6 +93,7 @@ o trabalho mesmo com a API integra.
 **Cobertura:** QEP-017 a QEP-021, QEP-023, QEP-025.
 
 ### R7 — Plataforma inacessivel a pessoas com deficiencia
+
 **Impacto:** medio. **Probabilidade:** media. **Classificacao:** medio.
 
 Alem da barreira de uso, ha exposicao legal. No Brasil, a LBI (Lei 13.146/2015)
@@ -99,6 +106,7 @@ no README.
 **Cobertura:** QEP-030.
 
 ### R8 — Degradacao sob carga na consulta de disponibilidade
+
 **Impacto:** medio. **Probabilidade:** media. **Classificacao:** medio.
 
 A consulta de disponibilidade e o endpoint mais chamado e o mais custoso.

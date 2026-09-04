@@ -44,9 +44,7 @@ test.describe('Integracao entre camadas', () => {
     const registradas = await clients.bookings.list(adminToken, quarto.body.roomid);
     esperarStatus(registradas, 200, 'consulta das reservas pela API');
 
-    const criada = registradas.body.bookings.find(
-      (item) => item.firstname === hospede.firstname,
-    );
+    const criada = registradas.body.bookings.find((item) => item.firstname === hospede.firstname);
     expect(criada, 'a reserva feita na interface deveria existir na API').toBeDefined();
     recursos.track('booking', (criada as { bookingid: number }).bookingid);
 
@@ -54,8 +52,9 @@ test.describe('Integracao entre camadas', () => {
       roomid: quarto.body.roomid,
       lastname: hospede.lastname,
     });
-    expect((criada as { bookingdates: { checkin: string; checkout: string } }).bookingdates)
-      .toEqual(estadia);
+    expect(
+      (criada as { bookingdates: { checkin: string; checkout: string } }).bookingdates,
+    ).toEqual(estadia);
   });
 
   test('QEP-027 reserva criada pela API aparece na administracao', async ({

@@ -16,10 +16,10 @@ contrato proprio.
 
 As duas superfícies discordam em pontos que importam:
 
-| Comportamento | Microsservico (`:3004/auth/login`) | BFF (`:8080/api/auth/login`) |
-| --- | --- | --- |
-| Login valido | 200, corpo vazio, `Set-Cookie: token=...` | 200, corpo `{"token":"..."}` |
-| Credencial invalida | 403 | 401 |
+| Comportamento       | Microsservico (`:3004/auth/login`)        | BFF (`:8080/api/auth/login`) |
+| ------------------- | ----------------------------------------- | ---------------------------- |
+| Login valido        | 200, corpo vazio, `Set-Cookie: token=...` | 200, corpo `{"token":"..."}` |
+| Credencial invalida | 403                                       | 401                          |
 
 Verificado com `curl` contra o ambiente local no commit `d36bd3f`.
 

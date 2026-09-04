@@ -66,10 +66,9 @@ test.describe('Reservas', () => {
 
     // O filtro so tem valor se tambem excluir o que nao pertence ao quarto.
     const quartosRetornados = new Set(listagem.body.bookings.map((item) => item.roomid));
-    expect(
-      [...quartosRetornados],
-      'o filtro nao pode devolver reservas de outros quartos',
-    ).toEqual([quarto.body.roomid]);
+    expect([...quartosRetornados], 'o filtro nao pode devolver reservas de outros quartos').toEqual(
+      [quarto.body.roomid],
+    );
   });
 
   test('QEP-010 reserva e atualizada por quem esta autenticado', async ({

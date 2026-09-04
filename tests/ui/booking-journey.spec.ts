@@ -51,7 +51,9 @@ test.describe('Jornada de reserva do hospede', () => {
     );
     expect(criada, 'a reserva confirmada na tela deveria existir na plataforma').toBeDefined();
     recursos.track('booking', (criada as { bookingid: number }).bookingid);
-    expect((criada as { bookingdates: { checkin: string } }).bookingdates.checkin).toBe(estadia.checkin);
+    expect((criada as { bookingdates: { checkin: string } }).bookingdates.checkin).toBe(
+      estadia.checkin,
+    );
   });
 
   test('QEP-023 reserva sem os dados obrigatorios e recusada com aviso', async ({
@@ -87,10 +89,9 @@ test.describe('Jornada de reserva do hospede', () => {
     // O aviso so tem valor se nada tiver sido gravado.
     const registradas = await clients.bookings.list(adminToken, quarto.body.roomid);
     esperarStatus(registradas, 200, 'consulta das reservas do quarto');
-    expect(
-      registradas.body.bookings,
-      'uma reserva recusada nao pode deixar registro',
-    ).toHaveLength(0);
+    expect(registradas.body.bookings, 'uma reserva recusada nao pode deixar registro').toHaveLength(
+      0,
+    );
   });
 
   test('QEP-024 combinacao invalida de datas nao gera reserva', async ({
@@ -136,4 +137,3 @@ test.describe('Jornada de reserva do hospede', () => {
     ).toHaveLength(0);
   });
 });
-
