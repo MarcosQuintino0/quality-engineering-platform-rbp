@@ -1,0 +1,17 @@
+{
+  "descricao": "Violacoes de acessibilidade ja existentes no SUT no commit d36bd3f, medidas em 04/09/2026 com axe-core via @axe-core/playwright, tags wcag2a, wcag2aa, wcag21a e wcag21aa. O numero e o maximo tolerado de elementos afetados por regra e por pagina. QEP-030 reprova qualquer regra nova ou qualquer aumento de ocorrencias. Ver docs/known-issues.md, RBP-06.",
+  "violacoesConhecidas": {
+    "Home": {
+      "color-contrast": 4,
+      "label": 3,
+      "link-name": 3
+    },
+    "Reserva do quarto": {
+      "color-contrast": 11,
+      "link-name": 3
+    },
+    "Login administrativo": {
+      "color-contrast": 1
+    }
+  }
+}
