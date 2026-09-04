@@ -1,0 +1,32 @@
+node_modules/
+dist/
+.env
+.env.local
+*.log
+
+# Artefatos de execucao do Playwright
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+
+# Allure
+allure-results/
+allure-report/
+
+# Resultados brutos de performance (apenas resumos sanitizados sao versionados)
+performance/results/raw/
+performance/results/*.json
+!performance/results/*.summary.json
+
+# Gravacoes temporarias de evidencias
+docs/assets/.tmp/
+*.webm
+
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Codigo-fonte do SUT clonado pelo bootstrap (dependencia externa, nao versionada)
+.sut/
