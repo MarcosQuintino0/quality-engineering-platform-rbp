@@ -30,12 +30,12 @@ O que distingue esta suíte:
 - **Verificação cruzada.** Uma reserva confirmada na tela é confirmada pela API;
   um valor gravado pela API é confirmado no banco. Verificar uma escrita pela
   mesma camada que a fez é circular e não prova persistência.
-- **Cinco defeitos reais encontrados** no sistema testado, cada um com passo de
+- **Seis defeitos reais encontrados** no sistema testado, cada um com passo de
   reprodução verificado. Nenhum deles virou asserção: assertar o bug o
   transformaria em contrato protegido pela própria suíte.
-- **Duas instabilidades encontradas e corrigidas na causa**, sem aumentar
-  timeout e sem retry. Apareceram justamente porque a suíte precisa passar em
-  execuções consecutivas antes de ser considerada pronta.
+- **Três instabilidades investigadas até a causa**, sem aumentar timeout e sem
+  retry. A terceira revelou um defeito de concorrência no próprio sistema
+  testado, reproduzido por script independente.
 - **Limites de performance derivados de medição**, não de estimativa. O ponto de
   saturação foi medido antes de qualquer threshold ser escrito.
 
@@ -384,7 +384,7 @@ Nenhuma das duas foi resolvida com timeout maior ou retry.
 
 ## Defeitos encontrados no sistema testado
 
-Cinco, todos com reprodução verificada em
+Seis, todos com reprodução verificada em
 [docs/known-issues.md](docs/known-issues.md):
 
 | ID     | Defeito                                                                                | Severidade |

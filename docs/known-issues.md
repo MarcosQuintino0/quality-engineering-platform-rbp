@@ -202,3 +202,100 @@ defeito em contrato protegido pela suite.
 
 A verificacao volta como assercao no momento em que o produto passar a tratar
 o caso, seja recusando a exclusao, seja removendo as reservas associadas.
+
+---
+
+## RBP-06 — Criação concorrente devolve o identificador e os dados de outro recurso
+
+**Severidade:** alta
+**Serviços:** rbp-room, rbp-booking, rbp-message (todos os que gravam)
+**Descoberto em:** 04/09/2026, por falha intermitente no GitHub Actions
+
+### Como apareceu
+
+A primeira execução da regressão completa no CI, com quatro workers, terminou
+com dois cenários instáveis: QEP-008 recebeu `409` ao reservar um quarto
+recém-criado, e QEP-010 recebeu `404` ao atualizar uma reserva que acabara de
+criar. Localmente, com oito workers, cinco execuções seguidas tinham passado.
+
+As duas mensagens são impossíveis isoladamente. Um quarto criado no próprio
+teste não tem reserva alguma, então não pode gerar conflito de datas. Uma
+reserva criada com sucesso não pode desaparecer antes da atualização.
+
+### Reprodução
+
+```bash
+node scripts/reproduce-rbp-06.js
+```
+
+O script cria quartos **simultaneamente** e compara o que foi enviado com o que
+voltou. Resultado observado em 150 criações, em seis rodadas de 25:
+
+```
+respostas com dados de outro quarto : 11
+identificadores duplicados          : 10
+falhas HTTP                         : 0
+
+exemplo: enviado "C0x4x80374" (preco 104),
+         recebido "C0x6x80374" (preco 106), roomid 323
+```
+
+Nenhuma requisição falhou. Todas devolveram `201`. Onze delas devolveram o
+recurso **errado**.
+
+### Causa
+
+Cada classe `*DB` é um componente Spring singleton que guarda uma única
+`java.sql.Connection` num campo:
+
+```java
+@Component
+public class BookingDB {
+    private Connection connection;   // compartilhada por todas as threads
+
+    public BookingDB() throws SQLException, IOException {
+        JdbcDataSource ds = new JdbcDataSource();
+        ds.setURL("jdbc:h2:mem:rbp-booking;MODE=MySQL");
+        connection = ds.getConnection();
+    }
+```
+
+Uma `Connection` JDBC não é segura para uso concorrente, e não há
+sincronização. Pior: a criação termina lendo o identificador gerado assim:
+
+```java
+ResultSet lastInsertId = connection.prepareStatement("SELECT LAST_INSERT_ID()").executeQuery();
+```
+
+`LAST_INSERT_ID()` é escopado por **conexão**, não por requisição. Como a
+conexão é uma só, duas requisições simultâneas disputam o mesmo valor: a
+thread A insere, a thread B insere, e a thread A lê o identificador de B.
+
+Isso explica exatamente os dois sintomas do CI. A criação do quarto devolveu o
+identificador de outro quarto, que já possuía reservas — daí o `409`. E a
+criação da reserva devolveu o identificador de uma reserva de outro cenário,
+que foi removida pela limpeza daquele cenário — daí o `404` na atualização.
+
+### Consequência
+
+Não é um problema de testes: é perda de integridade sob uso real. Dois hóspedes
+reservando ao mesmo tempo podem receber, cada um, o número de reserva do outro.
+A partir daí, cancelar a própria reserva cancela a do outro.
+
+### Mitigação adotada na suíte
+
+`framework/api-clients/creation-lock.ts` serializa **apenas o instante da
+criação** entre os workers, por meio de uma trava em arquivo.
+
+Sem ela, o defeito aparece como falhas dispersas em cenários diferentes a cada
+execução, e o diagnóstico se perde. Com ela, fica concentrado num registro
+único e verificável, e a suíte continua sendo sinal confiável para tudo o mais.
+O restante permanece paralelo; o custo são poucos milissegundos por recurso.
+
+A trava é contorno, não correção, e está documentada como tal no próprio
+arquivo.
+
+**Condição de saída:** quando o SUT passar a usar uma conexão por requisição ou
+sincronizar o acesso, a trava deve ser removida. A verificação é rodar
+`scripts/reproduce-rbp-06.js` com concorrência alta: se não reproduzir mais, a
+trava perdeu a razão de existir.

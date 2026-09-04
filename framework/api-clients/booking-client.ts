@@ -1,5 +1,6 @@
 import type { APIRequestContext } from '@playwright/test';
 
+import { criarComExclusao } from './creation-lock';
 import { HttpClient, type ApiResponse } from './http-client';
 import type { Booking, BookingPayload, CreatedBooking } from './types';
 
@@ -37,8 +38,9 @@ export class BookingClient {
     return this.http.get<Booking>(`/${bookingId}`, { token });
   }
 
+  /** Serializada entre workers por causa de RBP-06. Ver creation-lock.ts. */
   async create(payload: BookingPayload): Promise<ApiResponse<CreatedBooking>> {
-    return this.http.post<CreatedBooking>('/', payload);
+    return criarComExclusao(() => this.http.post<CreatedBooking>('/', payload));
   }
 
   async update(

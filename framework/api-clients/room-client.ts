@@ -1,5 +1,6 @@
 import type { APIRequestContext } from '@playwright/test';
 
+import { criarComExclusao } from './creation-lock';
 import { HttpClient, type ApiResponse } from './http-client';
 import type { Room, RoomPayload } from './types';
 
@@ -23,8 +24,13 @@ export class RoomClient {
     return this.http.get<Room>(`/${roomId}`);
   }
 
+  /**
+   * A criacao passa por exclusao mutua entre workers por causa de RBP-06: o
+   * SUT compartilha uma unica conexao JDBC entre threads e pode devolver o
+   * identificador de outro recurso. Ver framework/api-clients/creation-lock.ts.
+   */
   async create(payload: RoomPayload, token: string): Promise<ApiResponse<Room>> {
-    return this.http.post<Room>('/', payload, { token });
+    return criarComExclusao(() => this.http.post<Room>('/', payload, { token }));
   }
 
   /** Envia um corpo cru, para exercitar payloads deliberadamente invalidos. */

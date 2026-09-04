@@ -130,3 +130,47 @@ aplicacao usa esse papel, e o framework tambem usa.
 intencao original foi preservada: o teste continua exigindo que o erro seja
 anunciado de forma acessivel, apenas deixa de disputar com um elemento do
 framework.
+
+### FLK-03 — QEP-008 e QEP-010 instáveis no CI, estáveis localmente
+
+**Data:** 04/09/2026. **Categoria:** produto. **Status:** contornado, defeito
+registrado.
+
+A primeira execução da regressão completa no GitHub Actions terminou verde, mas
+com dois cenários marcados como instáveis: falharam na primeira tentativa e
+passaram no retry. Localmente, com oito workers, cinco execuções seguidas
+tinham passado.
+
+Um pipeline verde com dois instáveis não é uma execução saudável. As mensagens
+eram, aliás, impossíveis:
+
+```
+QEP-008: criacao de reserva: esperado HTTP 201, recebido 409
+QEP-010: atualizacao da reserva: esperado HTTP 200, recebido 404
+```
+
+Um quarto criado dentro do próprio teste não tem reserva alguma, e portanto não
+pode gerar conflito de datas. Uma reserva criada com sucesso não pode
+desaparecer antes da atualização. Quando a mensagem descreve algo impossível,
+a premissa é que está errada: o identificador devolvido não era o do recurso
+criado.
+
+A investigação levou ao código do SUT e a um script de reprodução independente:
+150 criações simultâneas produziram 11 respostas com dados de outro quarto e 10
+identificadores duplicados, todas com status `201`. A causa é uma única
+`java.sql.Connection` compartilhada entre threads, somada a
+`SELECT LAST_INSERT_ID()`, que é escopado por conexão.
+
+O defeito é do produto, e está registrado como **RBP-06** em
+`docs/known-issues.md`, com reprodução em `scripts/reproduce-rbp-06.js`.
+
+**Contorno.** Como o SUT não pode ser alterado por este repositório, a suíte
+serializa apenas o instante da criação de recursos, por meio de uma trava entre
+processos. Sem ela, o mesmo defeito apareceria a cada execução em cenários
+diferentes, e o diagnóstico se perderia. Com ela, fica concentrado num registro
+único e verificável.
+
+A trava é contorno explícito, com condição de saída documentada, e não
+correção. É a única situação neste projeto em que a suíte se ajusta a um
+defeito em vez de apenas reportá-lo — e a razão é que, sem o ajuste, ela
+deixaria de ser sinal confiável para todo o resto.

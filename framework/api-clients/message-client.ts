@@ -1,5 +1,6 @@
 import type { APIRequestContext } from '@playwright/test';
 
+import { criarComExclusao } from './creation-lock';
 import { HttpClient, type ApiResponse } from './http-client';
 import type { Message, MessagePayload } from './types';
 
@@ -31,8 +32,9 @@ export class MessageClient {
     this.http = new HttpClient(request, 'message');
   }
 
+  /** Serializada entre workers por causa de RBP-06. Ver creation-lock.ts. */
   async create(payload: MessagePayload): Promise<ApiResponse<Message>> {
-    return this.http.post<Message>('/', payload);
+    return criarComExclusao(() => this.http.post<Message>('/', payload));
   }
 
   async list(token: string): Promise<ApiResponse<MessagesResponse>> {
