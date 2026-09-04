@@ -20,6 +20,14 @@ updates:
           - '@eslint/*'
           - 'typescript-eslint'
           - 'prettier'
+    ignore:
+      # typescript-eslint@8 declara peer typescript >=4.8.4 <6.1.0. Um bump de
+      # major do TypeScript quebra o npm ci antes de qualquer verificacao rodar,
+      # e forcar a instalacao deixaria as regras tipadas do ESLint analisando uma
+      # versao que elas nao suportam. Reavaliar quando o typescript-eslint
+      # ampliar o intervalo.
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
     commit-message:
       prefix: chore
 

@@ -107,10 +107,18 @@ async function gravarJornada(roomid) {
   await pagina.waitForTimeout(RITMO);
 
   // Dados ficticios, sem qualquer informacao pessoal real.
-  await pagina.getByRole('textbox', { name: 'Firstname' }).pressSequentially('Marina', { delay: 55 });
-  await pagina.getByRole('textbox', { name: 'Lastname' }).pressSequentially('Duarte', { delay: 55 });
-  await pagina.getByRole('textbox', { name: 'Email' }).pressSequentially('marina@example.test', { delay: 35 });
-  await pagina.getByRole('textbox', { name: 'Phone' }).pressSequentially('551199990000', { delay: 35 });
+  await pagina
+    .getByRole('textbox', { name: 'Firstname' })
+    .pressSequentially('Marina', { delay: 55 });
+  await pagina
+    .getByRole('textbox', { name: 'Lastname' })
+    .pressSequentially('Duarte', { delay: 55 });
+  await pagina
+    .getByRole('textbox', { name: 'Email' })
+    .pressSequentially('marina@example.test', { delay: 35 });
+  await pagina
+    .getByRole('textbox', { name: 'Phone' })
+    .pressSequentially('551199990000', { delay: 35 });
   await pagina.waitForTimeout(RITMO);
 
   await pagina.getByRole('button', { name: 'Reserve Now' }).click();
@@ -138,10 +146,12 @@ function converterParaGif(video) {
     'ffmpeg',
     [
       '-y',
-      '-i', video,
+      '-i',
+      video,
       '-vf',
       'fps=9,scale=760:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=64:stats_mode=diff[p];[s1][p]paletteuse=dither=bayer:bayer_scale=4',
-      '-loop', '0',
+      '-loop',
+      '0',
       destino,
     ],
     { stdio: ['ignore', 'ignore', 'pipe'] },
