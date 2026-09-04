@@ -1,0 +1,65 @@
+{
+  "medidoEm": "2026-09-04",
+  "sutCommit": "d36bd3f8647a091d406e53bad463c5e3e5d2ece1",
+  "ambiente": {
+    "tipo": "maquina de desenvolvimento local",
+    "observacao": "Cliente e servidor na mesma maquina, sem rede entre eles. Os numeros nao autorizam conclusao sobre producao.",
+    "cpuLogicos": 16,
+    "memoriaDisponivelAoDockerGb": 6.7,
+    "sistema": "Windows 11 com Docker Desktop sobre WSL2"
+  },
+  "cenarios": {
+    "PERF-001": {
+      "nome": "smoke",
+      "perfil": "1 VU, 30 iteracoes",
+      "httpReqDurationMs": { "avg": 3.36, "med": 2.84, "p90": 3.4, "p95": 3.57, "max": 22.78 },
+      "httpReqFailedPct": 0.0,
+      "checksPct": 100.0,
+      "requisicoes": 60
+    },
+    "PERF-002": {
+      "nome": "carga progressiva",
+      "perfil": "degraus ate 50 VUs, pausa de 0,5s por iteracao",
+      "httpReqDurationMs": { "avg": 2.0, "med": 1.84, "p90": 2.66, "p95": 2.82, "max": 5.74 },
+      "httpReqFailedPct": 0.0,
+      "checksPct": 100.0,
+      "throughputReqPorSegundo": 88.7,
+      "requisicoes": 8874
+    },
+    "PERF-003": {
+      "nome": "carga combinada com criacao de reservas",
+      "perfil": "ate 30 VUs, uma escrita a cada dez iteracoes",
+      "httpReqDurationMs": { "avg": 2.18, "med": 1.75, "p90": 2.58, "p95": 3.07, "max": 29.96 },
+      "criacaoDeReservaMs": { "avg": 8.98, "med": 7.9, "p90": 15.97, "p95": 16.87, "max": 29.96 },
+      "httpReqFailedPct": 0.0,
+      "checksPct": 100.0
+    },
+    "PERF-004": {
+      "nome": "pico",
+      "perfil": "salto de 10 para 200 VUs, sem pausa",
+      "httpReqDurationMs": { "avg": 13.15, "med": 9.04, "p90": 32.44, "p95": 43.68, "max": 169.64 },
+      "httpReqFailedPct": 0.01,
+      "checksPct": 99.98,
+      "throughputReqPorSegundo": 4367.3,
+      "requisicoes": 399134
+    },
+    "PERF-005": {
+      "nome": "soak",
+      "perfil": "10 VUs por 3 minutos",
+      "httpReqDurationMs": { "avg": 2.45, "med": 2.38, "p90": 3.26, "p95": 3.46, "max": 6.29 },
+      "httpReqFailedPct": 0.0,
+      "checksPct": 100.0,
+      "requisicoes": 3580,
+      "observacao": "Latencia estavel do inicio ao fim: sem sinal de degradacao acumulada na duracao testada."
+    }
+  },
+  "saturacao": {
+    "descricao": "Cenario de stress usado apenas para calibrar limites, fora do catalogo.",
+    "perfil": "ate 300 VUs, sem pausa entre iteracoes",
+    "throughputReqPorSegundo": 5246.7,
+    "httpReqDurationMs": { "avg": 8.36, "med": 7.59, "p90": 14.54, "p95": 17.2, "max": 296.09 },
+    "httpReqFailedPct": 0.04,
+    "requisicoes": 512749,
+    "conclusao": "Mesmo a 5.200 req/s o p95 fica abaixo de 18ms. O SUT nao e o gargalo nas faixas exercitadas pelos cenarios do catalogo."
+  }
+}
