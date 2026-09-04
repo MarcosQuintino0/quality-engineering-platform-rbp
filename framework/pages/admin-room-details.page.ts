@@ -4,15 +4,28 @@ import type { Locator, Page } from '@playwright/test';
 export class AdminRoomDetailsPage {
   private readonly botaoEditar: Locator;
   private readonly botaoAtualizar: Locator;
+  private roomId: number | undefined;
 
   constructor(private readonly page: Page) {
     this.botaoEditar = page.getByRole('button', { name: 'Edit' });
     this.botaoAtualizar = page.locator('#update');
   }
 
+  /**
+   * Abre o detalhe e so retorna quando os dados do quarto ja chegaram.
+   *
+   * O botao Edit e renderizado antes do fetch do quarto terminar, entao
+   * espera-lo nao basta: seria possivel entrar em edicao com o formulario
+   * ainda vazio, preencher um campo e ve-lo sobrescrito quando a resposta
+   * chegasse. O titulo so exibe "Room: <nome>" depois que o estado e
+   * populado, e por isso e ele o sinal de que a pagina esta pronta.
+   */
   async abrir(roomId: number): Promise<void> {
+    this.roomId = roomId;
     await this.page.goto(`/admin/room/${roomId}`);
-    await this.botaoEditar.waitFor({ state: 'visible' });
+    await this.page
+      .getByRole('heading', { name: /^Room: \S+/ })
+      .waitFor({ state: 'visible' });
   }
 
   async entrarEmEdicao(): Promise<void> {
@@ -32,9 +45,22 @@ export class AdminRoomDetailsPage {
     }
   }
 
+  /**
+   * Salva e aguarda a resposta do servidor.
+   *
+   * Esperar apenas o formulario fechar seria enganoso: a saida do modo de
+   * edicao acontece no cliente e nao prova que a alteracao chegou a ser
+   * gravada.
+   */
   async salvar(): Promise<void> {
+    const resposta = this.page.waitForResponse(
+      (response) =>
+        response.url().includes(`/api/room/${this.roomId ?? ''}`) &&
+        response.request().method() === 'PUT',
+    );
+
     await this.botaoAtualizar.click();
-    // A saida do modo de edicao e o estado observavel que indica conclusao.
+    await resposta;
     await this.botaoEditar.waitFor({ state: 'visible' });
   }
 
