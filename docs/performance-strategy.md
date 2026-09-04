@@ -122,3 +122,8 @@ Os arquivos brutos do k6 ficam em `performance/results/raw/` e nao sao
 versionados: sao grandes e sem valor historico. O que entra no repositorio e o
 resumo sanitizado em `performance/results/`, com as metricas relevantes e a
 data da medicao.
+
+A saida do k6 e capturada e gravada pelo host, e nao pelo container. A imagem do
+k6 roda como usuario nao-root, e escrever direto no volume montado falha no CI,
+onde o diretorio pertence ao usuario do runner. O k6 registrava o erro e ainda
+assim encerrava com codigo zero, produzindo um job verde com falha dentro.
