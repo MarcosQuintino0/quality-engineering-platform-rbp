@@ -26,6 +26,7 @@
     "db:query": "node scripts/db-query.js",
     "perf:smoke": "node scripts/run-k6.js smoke",
     "perf:load": "node scripts/run-k6.js load",
+    "perf:mixed": "node scripts/run-k6.js mixed",
     "perf:stress": "node scripts/run-k6.js stress",
     "perf:spike": "node scripts/run-k6.js spike",
     "perf:soak": "node scripts/run-k6.js soak",

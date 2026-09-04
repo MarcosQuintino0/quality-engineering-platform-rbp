@@ -316,6 +316,13 @@ O relatório é publicado a cada push em `main`:
 O histórico é preservado entre execuções, para que o relatório mostre tendência
 e não apenas uma foto isolada.
 
+![Relatório Allure publicado: 30 casos de teste, 100% aprovados, com a distribuição por camada e o painel de ambiente identificando o commit fixado do sistema sob teste](docs/assets/screenshots/allure-publicado.png)
+
+O painel **Environment** responde à pergunta que quase nenhum relatório de teste
+responde: contra o que, exatamente, estes números foram medidos. **Executors**
+liga o relatório à execução do pipeline que o gerou. **Categories** aparece
+vazio numa execução verde porque não há falha alguma para classificar.
+
 ## Evidências e diagnóstico
 
 Uma falha precisa dizer o que houve sem exigir nova execução. Trace, screenshot,
@@ -338,11 +345,11 @@ por [evidencias] Quarto de demonstracao criado: 523
 | ------------------------------------ | ------------------------------------------------------------------------------------ |
 | Pipeline verde no GitHub Actions     | [pipeline-verde.png](docs/assets/screenshots/pipeline-verde.png)                     |
 | Relatório Allure publicado, 30 casos | [allure-publicado.png](docs/assets/screenshots/allure-publicado.png)                 |
-| Resumo do Allure gerado localmente   | [allure-resumo.png](docs/assets/screenshots/allure-resumo.png)                       |
+| Resultado do k6, cenário PERF-003    | [k6-resultado.png](docs/assets/screenshots/k6-resultado.png)                         |
 | Administração de quartos             | [administracao-de-quartos.png](docs/assets/screenshots/administracao-de-quartos.png) |
 | Detalhe de um quarto                 | [detalhe-do-quarto.png](docs/assets/screenshots/detalhe-do-quarto.png)               |
 | Página inicial                       | [home.png](docs/assets/screenshots/home.png)                                         |
-| Saída verbatim do k6 (PERF-001)      | [perf-001-smoke.txt](performance/results/perf-001-smoke.txt)                         |
+| Saída verbatim do k6, PERF-001       | [perf-001-smoke.txt](performance/results/perf-001-smoke.txt)                         |
 | Baseline de performance completa     | [baseline.summary.json](performance/results/baseline.summary.json)                   |
 
 ## Performance
@@ -361,6 +368,15 @@ Ponto de saturação medido antes de qualquer limite ser escrito: **5.246 req/s
 com p(95) de 17,2 ms** e 0,04% de falha, a 300 unidades virtuais. É esse número
 que dimensiona os demais limites — sessenta vezes mais carga ainda cabe dentro
 do limite de 25 ms do cenário de carga.
+
+![Saída do k6 no cenário PERF-003: todos os thresholds aprovados, incluindo um limite dedicado à criação de reserva, com 4.954 verificações de negócio e nenhuma requisição falha](docs/assets/screenshots/k6-resultado.png)
+
+Repare no limite separado para `{operacao:criar_reserva}`. A escrita percorre a
+regra de disponibilidade e grava no banco, então é naturalmente mais cara que
+uma consulta; medi-la junto com as leituras faria o volume de consultas diluir
+uma degradação na criação de reservas. Os checks também são de negócio, e não
+apenas de status: a listagem precisa devolver coleção não vazia e a criação
+precisa devolver identificador.
 
 **Estes números vêm de uma máquina de desenvolvimento, sem rede entre cliente e
 servidor, e não autorizam conclusão sobre produção.** Não há SLA definido para o

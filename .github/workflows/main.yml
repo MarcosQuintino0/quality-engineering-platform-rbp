@@ -56,7 +56,10 @@ jobs:
         run: |
           base="https://marcosquintino0.github.io/quality-engineering-platform-rbp/history"
           mkdir -p allure-results/history
-          for arquivo in history.json duration-trend.json categories-trend.json retry-trend.json; do
+          # history-trend.json e o arquivo que acumula os pontos do grafico de
+          # tendencia. Sem ele na lista, cada execucao recomeca do zero e o
+          # painel Trend fica preso em um unico ponto, sem linha alguma.
+          for arquivo in history.json history-trend.json duration-trend.json categories-trend.json retry-trend.json; do
             curl -sfL "$base/$arquivo" -o "allure-results/history/$arquivo" || true
           done
           echo "Historico restaurado: $(ls -1 allure-results/history 2>/dev/null | wc -l) arquivo(s)."
