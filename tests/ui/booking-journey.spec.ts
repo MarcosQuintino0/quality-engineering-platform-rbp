@@ -2,6 +2,7 @@ import { buildBooking, buildRoom, buildStayDates } from '../../framework/factori
 import { expect, test } from '../../framework/fixtures/test-fixtures';
 import { ReservationPage } from '../../framework/pages';
 import { esperarStatus } from '../../framework/assertions/api-assertions';
+import { obrigatorio } from '../../framework/assertions/obrigatorio';
 import { rastrear } from '../../framework/reporting/qep';
 
 test.describe('Jornada de reserva do hospede', () => {
@@ -49,11 +50,12 @@ test.describe('Jornada de reserva do hospede', () => {
     const criada = registradas.body.bookings.find(
       (item) => item.firstname === hospede.firstname && item.lastname === hospede.lastname,
     );
-    expect(criada, 'a reserva confirmada na tela deveria existir na plataforma').toBeDefined();
-    recursos.track('booking', (criada as { bookingid: number }).bookingid);
-    expect((criada as { bookingdates: { checkin: string } }).bookingdates.checkin).toBe(
-      estadia.checkin,
+    const naPlataforma = obrigatorio(
+      criada,
+      'a reserva confirmada na tela deveria existir na plataforma',
     );
+    recursos.track('booking', naPlataforma.bookingid);
+    expect(naPlataforma.bookingdates.checkin).toBe(estadia.checkin);
   });
 
   test('QEP-023 reserva sem os dados obrigatorios e recusada com aviso', async ({

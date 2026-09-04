@@ -2,6 +2,7 @@ import { buildBooking, buildRoom, buildStayDates } from '../../framework/factori
 import { expect, test } from '../../framework/fixtures/test-fixtures';
 import { AdminRoomDetailsPage, ReservationPage } from '../../framework/pages';
 import { esperarStatus } from '../../framework/assertions/api-assertions';
+import { obrigatorio } from '../../framework/assertions/obrigatorio';
 import { rastrear } from '../../framework/reporting/qep';
 
 test.describe('Integracao entre camadas', () => {
@@ -45,16 +46,14 @@ test.describe('Integracao entre camadas', () => {
     esperarStatus(registradas, 200, 'consulta das reservas pela API');
 
     const criada = registradas.body.bookings.find((item) => item.firstname === hospede.firstname);
-    expect(criada, 'a reserva feita na interface deveria existir na API').toBeDefined();
-    recursos.track('booking', (criada as { bookingid: number }).bookingid);
+    const confirmada = obrigatorio(criada, 'a reserva feita na interface deveria existir na API');
+    recursos.track('booking', confirmada.bookingid);
 
-    expect(criada).toMatchObject({
+    expect(confirmada).toMatchObject({
       roomid: quarto.body.roomid,
       lastname: hospede.lastname,
     });
-    expect(
-      (criada as { bookingdates: { checkin: string; checkout: string } }).bookingdates,
-    ).toEqual(estadia);
+    expect(confirmada.bookingdates).toEqual(estadia);
   });
 
   test('QEP-027 reserva criada pela API aparece na administracao', async ({

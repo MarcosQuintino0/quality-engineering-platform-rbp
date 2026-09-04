@@ -3,6 +3,7 @@ import { ContactForm } from '../../framework/components/contact-form.component';
 import { expect, test } from '../../framework/fixtures/test-fixtures';
 import { HomePage } from '../../framework/pages';
 import { esperarStatus } from '../../framework/assertions/api-assertions';
+import { obrigatorio } from '../../framework/assertions/obrigatorio';
 import { rastrear } from '../../framework/reporting/qep';
 
 test.describe('Contato pela interface', () => {
@@ -39,7 +40,7 @@ test.describe('Contato pela interface', () => {
     esperarStatus(caixa, 200, 'listagem de mensagens na administracao');
 
     const recebida = caixa.body.messages.find((item) => item.subject === mensagem.subject);
-    expect(recebida, 'a mensagem enviada deveria aparecer na administracao').toBeDefined();
-    recursos.track('message', (recebida as { id: number }).id);
+    const naCaixa = obrigatorio(recebida, 'a mensagem enviada deveria aparecer na administracao');
+    recursos.track('message', naCaixa.id);
   });
 });
