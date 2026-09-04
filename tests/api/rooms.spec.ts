@@ -94,7 +94,11 @@ test.describe('Quartos', () => {
     });
   });
 
-  test('QEP-007 quarto e excluido por quem esta autenticado', async ({ clients, adminToken }) => {
+  test('QEP-007 quarto e excluido por quem esta autenticado', async ({
+    clients,
+    adminToken,
+    recursos,
+  }) => {
     rastrear({
       id: 'QEP-007',
       camada: 'api',
@@ -105,6 +109,12 @@ test.describe('Quartos', () => {
     const criado = await clients.rooms.create(buildRoom(), adminToken);
     esperarStatus(criado, 201, 'preparacao: criacao do quarto');
     const roomid = criado.body.roomid;
+
+    // Registrado mesmo sendo o proprio teste que exclui: se a exclusao falhar,
+    // ou o teste quebrar antes dela, o quarto nao pode ficar para tras. O
+    // rastreador trata 404 como limpeza bem-sucedida, entao registrar aqui nao
+    // gera falso alarme quando a exclusao do teste funciona.
+    recursos.track('room', roomid);
 
     const removido = await clients.rooms.remove(roomid, adminToken);
     esperarStatus(removido, 202, 'exclusao do quarto');

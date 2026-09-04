@@ -85,6 +85,7 @@ test.describe('Administracao de quartos pela interface', () => {
     paginaAdmin,
     clients,
     adminToken,
+    recursos,
   }) => {
     rastrear({
       id: 'QEP-021',
@@ -96,6 +97,10 @@ test.describe('Administracao de quartos pela interface', () => {
     const criado = await clients.rooms.create(buildRoom(), adminToken);
     esperarStatus(criado, 201, 'preparacao: criacao do quarto via API');
     const roomid = criado.body.roomid;
+
+    // Registrado mesmo sendo o proprio teste que exclui, para que uma falha na
+    // interface nao deixe o quarto para tras.
+    recursos.track('room', roomid);
 
     const rooms = new AdminRoomsPage(paginaAdmin);
     await rooms.abrir();

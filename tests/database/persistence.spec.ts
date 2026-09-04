@@ -85,6 +85,9 @@ test.describe('Persistencia em banco', () => {
 
     const primeira = await clients.bookings.create(buildBooking(roomid));
     esperarStatus(primeira, 201, 'criacao da primeira reserva');
+    // Registrada apesar de ser excluida pelo proprio teste: se a exclusao nao
+    // acontecer, a reserva nao pode sobrar.
+    recursos.track('booking', primeira.body.bookingid);
     const segunda = await clients.bookings.create(buildBooking(roomid));
     esperarStatus(segunda, 201, 'criacao da segunda reserva');
     recursos.track('booking', segunda.body.bookingid);

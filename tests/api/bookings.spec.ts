@@ -133,6 +133,11 @@ test.describe('Reservas', () => {
     const criada = await clients.bookings.create(buildBooking(quarto.body.roomid));
     esperarStatus(criada, 201, 'preparacao: criacao da reserva');
 
+    // Registrado mesmo sendo o proprio teste que exclui: um teste que quebre
+    // antes da exclusao nao pode deixar residuo. O rastreador trata 404 como
+    // limpeza bem-sucedida.
+    recursos.track('booking', criada.body.bookingid);
+
     const removida = await clients.bookings.remove(criada.body.bookingid, adminToken);
     esperarStatus(removida, 202, 'exclusao da reserva');
 
