@@ -1,0 +1,32 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      # Playwright e seus complementos sobem juntos: atualizar o executor sem o
+      # reporter costuma quebrar a geracao do relatorio.
+      playwright:
+        patterns:
+          - '@playwright/*'
+          - 'allure-playwright'
+          - '@axe-core/playwright'
+      ferramentas-de-qualidade:
+        patterns:
+          - 'eslint*'
+          - '@eslint/*'
+          - 'typescript-eslint'
+          - 'prettier'
+    commit-message:
+      prefix: chore
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: ci

@@ -1,0 +1,101 @@
+name: Regressao programada
+
+# Roda de madrugada, quando ninguem espera por ela, e faz o que nao cabe no
+# ciclo de feedback de um pull request: segundo navegador, analise de
+# instabilidade e carga leve.
+on:
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  regressao-multiplataforma:
+    name: Catalogo em Chromium e Firefox
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Preparar ambiente do SUT
+        uses: ./.github/actions/setup-sut
+        with:
+          navegadores: chromium firefox
+
+      - name: Catalogo completo
+        run: npx playwright test
+
+      # O projeto ui-firefox reexecuta os nove cenarios de interface. Fica fora
+      # da execucao padrao porque repetiria cenarios ja contados e inflaria a
+      # contagem logica de 30 para 39.
+      - name: Interface em Firefox
+        env:
+          RUN_FIREFOX: 'true'
+        run: npx playwright test --project=ui-firefox
+
+      - name: Publicar evidencias de falha
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidencias-programada
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 14
+
+  analise-de-instabilidade:
+    name: Analise de instabilidade
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Preparar ambiente do SUT
+        uses: ./.github/actions/setup-sut
+
+      # Tres execucoes seguidas sem retry. Um cenario que oscila entre elas e
+      # instavel, e a politica em docs/flaky-test-policy.md descreve o que fazer
+      # a partir dai. Com retry ligado, a oscilacao ficaria invisivel.
+      - name: Tres execucoes consecutivas
+        run: |
+          falhas=0
+          for i in 1 2 3; do
+            echo "::group::Execucao $i"
+            if npx playwright test --retries=0; then
+              echo "execucao $i: aprovada"
+            else
+              echo "execucao $i: reprovada"
+              falhas=$((falhas + 1))
+            fi
+            echo "::endgroup::"
+          done
+          echo "Execucoes reprovadas: $falhas de 3"
+          if [ "$falhas" -gt 0 ]; then
+            echo "::warning::A suite nao foi estavel nas tres execucoes. Ver docs/flaky-test-policy.md."
+            exit 1
+          fi
+
+  carga-leve:
+    name: Smoke de performance
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Preparar ambiente do SUT
+        uses: ./.github/actions/setup-sut
+
+      # Apenas o smoke na execucao recorrente. Stress, pico e soak sao caros e
+      # so rodam por acionamento manual explicito.
+      - name: PERF-001 smoke
+        run: node scripts/run-k6.js smoke
+
+      - name: Guardar resumo
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-smoke
+          path: performance/results/raw/
+          retention-days: 7

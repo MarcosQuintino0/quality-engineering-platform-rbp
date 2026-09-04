@@ -1,0 +1,61 @@
+name: Preparar ambiente do SUT
+description: >
+  Instala dependencias, compila o Restful Booker Platform no commit fixado e
+  sobe o ambiente em containers, aguardando os servicos ficarem saudaveis.
+
+inputs:
+  navegadores:
+    description: Navegadores do Playwright a instalar, separados por espaco.
+    required: false
+    default: chromium
+
+runs:
+  using: composite
+  steps:
+    - name: Configurar Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+        cache: npm
+
+    - name: Instalar dependencias
+      shell: bash
+      run: npm ci
+
+    # O cache e chaveado pelo commit fixado do SUT: enquanto a versao nao muda,
+    # nem as dependencias Maven nem os artefatos compilados precisam ser
+    # refeitos, o que economiza alguns minutos por execucao.
+    - name: Restaurar cache do SUT compilado
+      uses: actions/cache@v4
+      with:
+        path: |
+          .m2
+          .sut/restful-booker-platform/*/target
+        key: sut-${{ hashFiles('scripts/sut-version.json') }}-${{ runner.os }}
+        restore-keys: |
+          sut-${{ hashFiles('scripts/sut-version.json') }}-
+
+    - name: Preparar o SUT
+      shell: bash
+      run: node scripts/bootstrap-sut.js
+
+    - name: Instalar navegadores do Playwright
+      shell: bash
+      run: npx playwright install --with-deps ${{ inputs.navegadores }}
+
+    - name: Subir o ambiente
+      shell: bash
+      run: docker compose up -d --build
+
+    - name: Aguardar os servicos
+      shell: bash
+      run: node scripts/wait-for-services.js
+
+    - name: Diagnosticar ambiente quando a subida falha
+      if: failure()
+      shell: bash
+      run: |
+        echo "=== estado dos containers ==="
+        docker compose ps
+        echo "=== logs ==="
+        docker compose logs --tail=80

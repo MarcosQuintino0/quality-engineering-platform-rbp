@@ -1,0 +1,96 @@
+name: Regressao completa
+
+# Executa os 30 cenarios do catalogo a cada push na branch principal e
+# publica o relatorio Allure no GitHub Pages.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: main
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  regressao:
+    name: Catalogo completo em Chromium
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Preparar ambiente do SUT
+        uses: ./.github/actions/setup-sut
+
+      - name: Executar os 30 cenarios
+        run: npx playwright test
+
+      - name: Publicar evidencias de falha
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidencias-regressao
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 14
+
+      - name: Logs do ambiente quando ha falha
+        if: failure()
+        run: docker compose logs --tail=200
+
+      # O historico do Allure preserva a tendencia entre execucoes. Sem ele,
+      # cada relatorio mostraria apenas uma foto isolada.
+      - name: Restaurar historico do Allure
+        if: always()
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: pages-anterior
+
+      - name: Preservar historico
+        if: always()
+        run: |
+          if [ -d pages-anterior/history ]; then
+            cp -r pages-anterior/history allure-results/history || true
+          fi
+
+      - name: Gerar relatorio Allure
+        if: always()
+        run: npm run allure:generate
+
+      - name: Guardar relatorio como artefato
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report/
+          retention-days: 30
+
+      - name: Configurar Pages
+        if: always()
+        uses: actions/configure-pages@v5
+
+      - name: Enviar relatorio para o Pages
+        if: always()
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: allure-report
+
+  publicar:
+    name: Publicar Allure no GitHub Pages
+    needs: regressao
+    if: always()
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

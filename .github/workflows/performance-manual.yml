@@ -1,0 +1,55 @@
+name: Performance sob demanda
+
+# Cenarios de carga so rodam por acionamento humano explicito, com o cenario e a
+# duracao escolhidos na hora. Stress, pico e soak sao caros e um disparo
+# acidental tem consequencia real.
+on:
+  workflow_dispatch:
+    inputs:
+      cenario:
+        description: Cenario de performance a executar
+        required: true
+        default: smoke
+        type: choice
+        options:
+          - smoke
+          - load
+          - mixed
+          - spike
+          - soak
+          - stress
+      duracao:
+        description: Duracao do soak, por exemplo 5m ou 30m. Ignorado nos demais cenarios.
+        required: false
+        default: 5m
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  performance:
+    name: k6 ${{ inputs.cenario }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Preparar ambiente do SUT
+        uses: ./.github/actions/setup-sut
+
+      # O alvo e sempre o ambiente local do runner. O proprio scripts/run-k6.js
+      # recusa qualquer host fora da allowlist antes de iniciar, de modo que nem
+      # um erro de configuracao aponte carga para a instancia publica do RBP.
+      - name: Executar ${{ inputs.cenario }}
+        env:
+          K6_DURATION: ${{ inputs.duracao }}
+        run: node scripts/run-k6.js ${{ inputs.cenario }}
+
+      - name: Guardar resultado
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-${{ inputs.cenario }}
+          path: performance/results/raw/
+          retention-days: 30
