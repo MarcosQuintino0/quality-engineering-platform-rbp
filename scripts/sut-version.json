@@ -1,0 +1,7 @@
+{
+  "repository": "https://github.com/mwinteringham/restful-booker-platform.git",
+  "commit": "d36bd3f8647a091d406e53bad463c5e3e5d2ece1",
+  "describedAs": "restful-booker-platform 2.2-SNAPSHOT (main em 2026-07-01)",
+  "mavenImage": "maven:3.9-eclipse-temurin-26",
+  "rationale": "Commit fixado para garantir que contratos, validacoes e comportamento observado durante a construcao da suite sejam reproduziveis."
+}

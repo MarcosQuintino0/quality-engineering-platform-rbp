@@ -1,0 +1,164 @@
+# ---------------------------------------------------------------------------
+# Ambiente local do Restful Booker Platform (SUT).
+#
+# As imagens sao construidas a partir do codigo-fonte oficial, clonado em
+# .sut/restful-booker-platform num commit fixo por scripts/bootstrap-sut.js.
+# Este repositorio nao contem nem modifica o codigo do SUT.
+#
+# A variavel dbServer=true ativa o servidor TCP H2 que o proprio SUT oferece,
+# permitindo consulta somente leitura ao banco a partir dos testes.
+# A variavel dbRefresh e deliberadamente omitida: com ela ausente o SUT nao
+# agenda reset periodico do banco, o que manteria o ambiente nao deterministico.
+# ---------------------------------------------------------------------------
+name: rbp
+
+x-service-defaults: &service-defaults
+  restart: unless-stopped
+  environment: &service-env
+    profile: prod
+    dbServer: "true"
+
+services:
+  rbp-auth:
+    <<: *service-defaults
+    build: ./.sut/restful-booker-platform/auth
+    container_name: rbp-auth
+    ports:
+      - "3004:3004"
+      - "9091:9091"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:3004/auth/actuator/health | grep -q UP"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 20s
+
+  rbp-booking:
+    <<: *service-defaults
+    build: ./.sut/restful-booker-platform/booking
+    container_name: rbp-booking
+    environment:
+      <<: *service-env
+      authDomain: rbp-auth
+      messageDomain: rbp-message
+    ports:
+      - "3000:3000"
+      - "9090:9090"
+    depends_on:
+      rbp-auth:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:3000/booking/actuator/health | grep -q UP"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 20s
+
+  rbp-room:
+    <<: *service-defaults
+    build: ./.sut/restful-booker-platform/room
+    container_name: rbp-room
+    environment:
+      <<: *service-env
+      authDomain: rbp-auth
+      bookingDomain: rbp-booking
+    ports:
+      - "3001:3001"
+      - "9094:9094"
+    depends_on:
+      rbp-auth:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:3001/room/actuator/health | grep -q UP"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 20s
+
+  rbp-branding:
+    <<: *service-defaults
+    build: ./.sut/restful-booker-platform/branding
+    container_name: rbp-branding
+    environment:
+      <<: *service-env
+      authDomain: rbp-auth
+    ports:
+      - "3002:3002"
+      - "9092:9092"
+    depends_on:
+      rbp-auth:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:3002/branding/actuator/health | grep -q UP"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 20s
+
+  rbp-message:
+    <<: *service-defaults
+    build: ./.sut/restful-booker-platform/message
+    container_name: rbp-message
+    environment:
+      <<: *service-env
+      authDomain: rbp-auth
+    ports:
+      - "3006:3006"
+      - "9093:9093"
+    depends_on:
+      rbp-auth:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:3006/message/actuator/health | grep -q UP"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 20s
+
+  rbp-report:
+    <<: *service-defaults
+    build: ./.sut/restful-booker-platform/report
+    container_name: rbp-report
+    environment:
+      <<: *service-env
+      authDomain: rbp-auth
+      bookingDomain: rbp-booking
+      roomDomain: rbp-room
+    ports:
+      - "3005:3005"
+    depends_on:
+      rbp-booking:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:3005/report/actuator/health | grep -q UP"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 20s
+
+  rbp-assets:
+    build: ./.sut/restful-booker-platform/assets
+    container_name: rbp-assets
+    restart: unless-stopped
+    environment:
+      BOOKING_API: http://rbp-booking:3000
+      ROOM_API: http://rbp-room:3001
+      BRANDING_API: http://rbp-branding:3002
+      AUTH_API: http://rbp-auth:3004
+      MESSAGE_API: http://rbp-message:3006
+      REPORT_API: http://rbp-report:3005
+    # A porta 80 do container e publicada em 8080 para nao exigir privilegios
+    # nem competir com servidores web ja instalados na maquina.
+    ports:
+      - "8080:80"
+    depends_on:
+      rbp-booking:
+        condition: service_healthy
+      rbp-room:
+        condition: service_healthy
+      rbp-branding:
+        condition: service_healthy
+      rbp-message:
+        condition: service_healthy
+      rbp-report:
+        condition: service_healthy
