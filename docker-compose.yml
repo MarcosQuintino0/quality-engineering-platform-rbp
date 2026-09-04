@@ -137,7 +137,9 @@ services:
       start_period: 20s
 
   rbp-assets:
-    build: ./.sut/restful-booker-platform/assets
+    build:
+      context: ./.sut/restful-booker-platform/assets
+      dockerfile: ../../../docker/assets.Dockerfile
     container_name: rbp-assets
     restart: unless-stopped
     environment:

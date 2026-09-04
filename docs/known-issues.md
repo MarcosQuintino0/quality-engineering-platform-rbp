@@ -92,3 +92,113 @@ tem duas consequencias praticas para os testes:
 2. Essas mensagens nao sao criadas pelos testes e nao entram no rastreador de
    limpeza. Elas desaparecem quando o ambiente e recriado, ja que o H2 e
    em memoria. A estrategia esta detalhada em `docs/test-data-strategy.md`.
+
+---
+
+## RBP-04 — Frontend em container nao alcanca as APIs: rewrites congelados em localhost
+
+**Severidade:** alta (impede o uso do frontend na implantacao em container)
+**Servico:** rbp-assets
+**Descoberto em:** 04/09/2026
+
+**Sintoma**
+
+Com o ambiente subido pelo `docker-compose.yml` do proprio RBP, abrir o detalhe
+de um quarto na administracao ou excluir um quarto pela interface falha. As
+chamadas devolvem 500 e o log do container mostra:
+
+```
+Failed to proxy http://localhost:3001/room/30 Error: connect ECONNREFUSED 127.0.0.1:3001
+```
+
+**Reproducao**
+
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8080/api/room      # 200
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8080/api/room/1    # 500
+```
+
+**Causa**
+
+`assets/next.config.js` monta os rewrites de `/api/*` a partir de variaveis de
+ambiente, com `localhost` como valor padrao:
+
+```js
+const roomApi = process.env.ROOM_API || 'http://localhost:3001';
+```
+
+O projeto usa `output: 'standalone'`, e nesse modo a configuracao e serializada
+durante o `npm run build`. O `Dockerfile` do RBP, porem, declara `ROOM_API` e as
+demais variaveis **apenas no estagio runner**, depois da compilacao. No estagio
+builder elas nao existem, entao o build congela os rewrites apontando para
+`localhost`.
+
+Fora de container o efeito e invisivel, porque `run_locally` sobe todos os
+servicos na mesma maquina e `localhost` esta correto. Dentro de container,
+`localhost` e o proprio frontend, e nao ha nada escutando naquelas portas.
+
+As variaveis definidas em tempo de execucao (que o `docker-compose.yml` do RBP
+define corretamente) chegam tarde demais: os rewrites ja foram gravados.
+
+**Contorno adotado**
+
+`docker/assets.Dockerfile` neste repositorio define as mesmas variaveis tambem
+no estagio de compilacao. Nenhuma linha do codigo do SUT e alterada; muda apenas
+a receita de build, que e configuracao de ambiente.
+
+**Impacto na suite**
+
+Sem o contorno, QEP-020 e QEP-021 falham por indisponibilidade de infraestrutura,
+e nao por defeito de comportamento. Deixar assim produziria falhas que nao
+apontam para nada acionavel, que e o pior tipo de teste vermelho.
+
+---
+
+## RBP-05 — Excluir um quarto deixa reservas orfas no banco de reservas
+
+**Severidade:** alta
+**Servicos:** rbp-room e rbp-booking
+**Descoberto em:** 04/09/2026, por QEP-029
+
+**Reproducao**
+
+1. Crie um quarto pela API e anote o `roomid`.
+2. Crie duas reservas para esse quarto.
+3. Exclua o quarto: `DELETE /room/{roomid}` devolve 202.
+4. Consulte o banco de reservas:
+   `SELECT * FROM BOOKINGS WHERE roomid = {roomid}`.
+
+**Esperado:** nenhuma reserva apontando para um quarto que nao existe mais, ou
+uma recusa da exclusao enquanto houver reservas ativas.
+
+**Observado:** a exclusao e aceita e as reservas continuam gravadas, apontando
+para um `roomid` inexistente.
+
+**Causa**
+
+`RoomService.deleteRoom` apaga apenas a linha da tabela `ROOMS` no banco do
+proprio servico. O servico de quartos possui uma classe `BookingRequests`, mas
+ela e usada somente para consultar disponibilidade em
+`/booking/unavailable`; nao ha chamada, evento ou compensacao que informe o
+servico de reservas sobre a exclusao.
+
+Numa arquitetura de servicos com bancos separados nao existe integridade
+referencial entre eles: ou o servico coordena explicitamente, ou o dado fica
+inconsistente. Aqui nao ha coordenacao.
+
+**Consequencia**
+
+Reservas passam a referenciar um quarto inexistente. Relatorios por quarto e
+telas administrativas que resolvem o `roomid` podem falhar ou omitir dados, e
+nao ha caminho pela interface para localizar ou limpar essas reservas.
+
+**Impacto na suite**
+
+QEP-029 verifica o comportamento que esta correto: excluir uma reserva remove
+exatamente a linha dela e nao afeta as demais. A ausencia de orfas nao virou
+assercao porque hoje ela falharia sempre, e um teste permanentemente vermelho
+deixa de ser sinal. Assertar a presenca das orfas seria pior: transformaria o
+defeito em contrato protegido pela suite.
+
+A verificacao volta como assercao no momento em que o produto passar a tratar
+o caso, seja recusando a exclusao, seja removendo as reservas associadas.
