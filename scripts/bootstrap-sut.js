@@ -3,7 +3,7 @@
  * Prepara o sistema sob teste (SUT).
  *
  * O Restful Booker Platform e tratado como dependencia externa: o codigo e
- * clonado num commit fixo dentro de .sut/ (fora do controle de versao deste
+ * obtido num commit fixo dentro de .sut/ (fora do controle de versao deste
  * repositorio) e os artefatos Java sao compilados dentro de um container
  * Maven, evitando exigir JDK 26 e Maven instalados globalmente na maquina.
  */
@@ -31,22 +31,53 @@ function run(command, args, options = {}) {
   execFileSync(command, args, { stdio: 'inherit', ...options });
 }
 
+/** Executa ignorando falha, para comandos cujo erro e um resultado aceitavel. */
+function runQuiet(command, args, options = {}) {
+  try {
+    execFileSync(command, args, { stdio: 'ignore', ...options });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function log(message) {
   process.stdout.write(`[bootstrap-sut] ${message}\n`);
 }
 
-function ensureClone() {
-  if (fs.existsSync(path.join(SUT_DIR, '.git'))) {
-    log('Repositorio do SUT ja presente, sincronizando com o commit fixado.');
-    run('git', ['fetch', '--quiet', 'origin'], { cwd: SUT_DIR });
-  } else {
-    log(`Clonando ${VERSION.repository}`);
-    fs.mkdirSync(path.dirname(SUT_DIR), { recursive: true });
-    run('git', ['clone', '--quiet', VERSION.repository, SUT_DIR]);
+/**
+ * Coloca o codigo do SUT em .sut/ no commit fixado.
+ *
+ * Nao usa "git clone" porque o diretorio pode ja existir sem ser um
+ * repositorio: no CI, o cache restaura os artefatos compilados em
+ * .sut/restful-booker-platform/<modulo>/target antes deste passo, e clone
+ * recusa diretorio nao vazio. Inicializar no lugar e buscar o commit exato
+ * funciona nos dois casos, e o fetch raso e mais rapido que um clone completo.
+ */
+function ensureSource() {
+  fs.mkdirSync(SUT_DIR, { recursive: true });
+
+  if (!fs.existsSync(path.join(SUT_DIR, '.git'))) {
+    log('Inicializando repositorio do SUT.');
+    run('git', ['init', '--quiet'], { cwd: SUT_DIR });
   }
 
-  log(`Fixando no commit ${VERSION.commit}`);
-  run('git', ['checkout', '--quiet', VERSION.commit], { cwd: SUT_DIR });
+  // Recria o remote a cada execucao para que uma troca de URL em
+  // sut-version.json passe a valer sem exigir limpeza manual.
+  runQuiet('git', ['remote', 'remove', 'origin'], { cwd: SUT_DIR });
+  run('git', ['remote', 'add', 'origin', VERSION.repository], { cwd: SUT_DIR });
+
+  log(`Buscando o commit fixado ${VERSION.commit}`);
+  run('git', ['fetch', '--quiet', '--depth', '1', 'origin', VERSION.commit], { cwd: SUT_DIR });
+  run('git', ['checkout', '--quiet', '--force', 'FETCH_HEAD'], { cwd: SUT_DIR });
+
+  const atual = execFileSync('git', ['rev-parse', 'HEAD'], {
+    cwd: SUT_DIR,
+    encoding: 'utf8',
+  }).trim();
+  if (atual !== VERSION.commit) {
+    throw new Error(`Esperado o commit ${VERSION.commit}, mas o SUT ficou em ${atual}.`);
+  }
 }
 
 function jarsPresent() {
@@ -90,7 +121,7 @@ function buildJars() {
 }
 
 function main() {
-  ensureClone();
+  ensureSource();
   buildJars();
   log('SUT pronto. Execute "npm run env:up" para subir o ambiente.');
 }
