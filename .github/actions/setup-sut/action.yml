@@ -13,7 +13,7 @@ runs:
   using: composite
   steps:
     - name: Configurar Node
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v7
       with:
         node-version: '22'
         cache: npm
@@ -26,7 +26,7 @@ runs:
     # nem as dependencias Maven nem os artefatos compilados precisam ser
     # refeitos, o que economiza alguns minutos por execucao.
     - name: Restaurar cache do SUT compilado
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: |
           .m2

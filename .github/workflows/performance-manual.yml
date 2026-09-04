@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Preparar ambiente do SUT
         uses: ./.github/actions/setup-sut
@@ -48,7 +48,7 @@ jobs:
 
       - name: Guardar resultado
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: k6-${{ inputs.cenario }}
           path: performance/results/raw/

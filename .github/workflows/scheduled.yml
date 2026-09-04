@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 50
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Preparar ambiente do SUT
         uses: ./.github/actions/setup-sut
@@ -37,7 +37,7 @@ jobs:
 
       - name: Publicar evidencias de falha
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: evidencias-programada
           path: |
@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 50
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Preparar ambiente do SUT
         uses: ./.github/actions/setup-sut
@@ -82,7 +82,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Preparar ambiente do SUT
         uses: ./.github/actions/setup-sut
@@ -94,7 +94,7 @@ jobs:
 
       - name: Guardar resumo
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: k6-smoke
           path: performance/results/raw/
