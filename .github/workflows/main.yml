@@ -44,21 +44,34 @@ jobs:
         if: failure()
         run: docker compose logs --tail=200
 
-      # O historico do Allure preserva a tendencia entre execucoes. Sem ele,
-      # cada relatorio mostraria apenas uma foto isolada.
+      # O historico preserva a tendencia entre execucoes; sem ele, cada
+      # relatorio seria uma foto isolada. Ele e baixado do proprio relatorio ja
+      # publicado, e nao por um checkout adicional: um segundo actions/checkout
+      # limpa o workspace com git clean -ffdx, que remove arquivos ignorados, e
+      # allure-results esta no .gitignore. Foi assim que a primeira execucao
+      # publicou um relatorio vazio.
       - name: Restaurar historico do Allure
         if: always()
-        uses: actions/checkout@v4
         continue-on-error: true
-        with:
-          ref: gh-pages
-          path: pages-anterior
+        run: |
+          base="https://marcosquintino0.github.io/quality-engineering-platform-rbp/history"
+          mkdir -p allure-results/history
+          for arquivo in history.json duration-trend.json categories-trend.json retry-trend.json; do
+            curl -sfL "$base/$arquivo" -o "allure-results/history/$arquivo" || true
+          done
+          echo "Historico restaurado: $(ls -1 allure-results/history 2>/dev/null | wc -l) arquivo(s)."
 
-      - name: Preservar historico
+      # Guarda contra publicar relatorio vazio sem ninguem perceber. Um
+      # relatorio que gera com sucesso e nao contem teste algum e pior do que
+      # nenhum relatorio: passa a impressao de que ha evidencia onde nao ha.
+      - name: Conferir que ha resultados a reportar
         if: always()
         run: |
-          if [ -d pages-anterior/history ]; then
-            cp -r pages-anterior/history allure-results/history || true
+          total=$(ls -1 allure-results/*-result.json 2>/dev/null | wc -l)
+          echo "Resultados encontrados: $total"
+          if [ "$total" -eq 0 ]; then
+            echo "::error::allure-results esta vazio. O relatorio seria publicado sem nenhum teste."
+            exit 1
           fi
 
       - name: Gerar relatorio Allure
