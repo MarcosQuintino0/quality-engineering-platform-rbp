@@ -16,7 +16,7 @@ x-service-defaults: &service-defaults
   restart: unless-stopped
   environment: &service-env
     profile: prod
-    dbServer: "true"
+    dbServer: 'true'
 
 services:
   rbp-auth:
@@ -24,10 +24,10 @@ services:
     build: ./.sut/restful-booker-platform/auth
     container_name: rbp-auth
     ports:
-      - "3004:3004"
-      - "9091:9091"
+      - '3004:3004'
+      - '9091:9091'
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O - http://localhost:3004/auth/actuator/health | grep -q UP"]
+      test: ['CMD-SHELL', 'wget -q -O - http://localhost:3004/auth/actuator/health | grep -q UP']
       interval: 5s
       timeout: 3s
       retries: 30
@@ -42,13 +42,13 @@ services:
       authDomain: rbp-auth
       messageDomain: rbp-message
     ports:
-      - "3000:3000"
-      - "9090:9090"
+      - '3000:3000'
+      - '9090:9090'
     depends_on:
       rbp-auth:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O - http://localhost:3000/booking/actuator/health | grep -q UP"]
+      test: ['CMD-SHELL', 'wget -q -O - http://localhost:3000/booking/actuator/health | grep -q UP']
       interval: 5s
       timeout: 3s
       retries: 30
@@ -63,13 +63,13 @@ services:
       authDomain: rbp-auth
       bookingDomain: rbp-booking
     ports:
-      - "3001:3001"
-      - "9094:9094"
+      - '3001:3001'
+      - '9094:9094'
     depends_on:
       rbp-auth:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O - http://localhost:3001/room/actuator/health | grep -q UP"]
+      test: ['CMD-SHELL', 'wget -q -O - http://localhost:3001/room/actuator/health | grep -q UP']
       interval: 5s
       timeout: 3s
       retries: 30
@@ -83,13 +83,14 @@ services:
       <<: *service-env
       authDomain: rbp-auth
     ports:
-      - "3002:3002"
-      - "9092:9092"
+      - '3002:3002'
+      - '9092:9092'
     depends_on:
       rbp-auth:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O - http://localhost:3002/branding/actuator/health | grep -q UP"]
+      test:
+        ['CMD-SHELL', 'wget -q -O - http://localhost:3002/branding/actuator/health | grep -q UP']
       interval: 5s
       timeout: 3s
       retries: 30
@@ -103,13 +104,13 @@ services:
       <<: *service-env
       authDomain: rbp-auth
     ports:
-      - "3006:3006"
-      - "9093:9093"
+      - '3006:3006'
+      - '9093:9093'
     depends_on:
       rbp-auth:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O - http://localhost:3006/message/actuator/health | grep -q UP"]
+      test: ['CMD-SHELL', 'wget -q -O - http://localhost:3006/message/actuator/health | grep -q UP']
       interval: 5s
       timeout: 3s
       retries: 30
@@ -125,12 +126,12 @@ services:
       bookingDomain: rbp-booking
       roomDomain: rbp-room
     ports:
-      - "3005:3005"
+      - '3005:3005'
     depends_on:
       rbp-booking:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O - http://localhost:3005/report/actuator/health | grep -q UP"]
+      test: ['CMD-SHELL', 'wget -q -O - http://localhost:3005/report/actuator/health | grep -q UP']
       interval: 5s
       timeout: 3s
       retries: 30
@@ -152,7 +153,7 @@ services:
     # A porta 80 do container e publicada em 8080 para nao exigir privilegios
     # nem competir com servidores web ja instalados na maquina.
     ports:
-      - "8080:80"
+      - '8080:80'
     depends_on:
       rbp-booking:
         condition: service_healthy

@@ -22,6 +22,8 @@ log('Construindo e subindo os containers.');
 execFileSync('docker', ['compose', 'up', '-d', '--build'], { cwd: ROOT, stdio: 'inherit' });
 
 log('Aguardando os servicos ficarem saudaveis.');
-execFileSync(process.execPath, [path.join(__dirname, 'wait-for-services.js')], { stdio: 'inherit' });
+execFileSync(process.execPath, [path.join(__dirname, 'wait-for-services.js')], {
+  stdio: 'inherit',
+});
 
 log('Ambiente disponivel em http://localhost:8080');
