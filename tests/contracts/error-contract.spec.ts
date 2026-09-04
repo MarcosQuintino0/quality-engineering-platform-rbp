@@ -1,5 +1,7 @@
+import type { ValidationError } from '../../framework/api-clients';
 import { expect, test } from '../../framework/fixtures/test-fixtures';
 import { esperarStatus } from '../../framework/assertions/api-assertions';
+import { obrigatorio } from '../../framework/assertions/obrigatorio';
 import { rastrear } from '../../framework/reporting/qep';
 import { validateContract, validationErrorSchema } from '../../framework/schemas';
 
@@ -36,7 +38,10 @@ test.describe('Contrato de erro', () => {
     const contrato = validateContract(validationErrorSchema, resposta.body);
     expect(contrato.errors, `contrato de erro violado: ${contrato.errors.join(' | ')}`).toEqual([]);
 
-    const corpo = resposta.body as { fieldErrors: string[] };
+    const corpo = obrigatorio(
+      resposta.body as ValidationError | undefined,
+      'a resposta de erro deveria ter corpo JSON',
+    );
     expect(
       corpo.fieldErrors.length,
       `esperado um erro por campo invalido, recebido: ${JSON.stringify(corpo.fieldErrors)}`,

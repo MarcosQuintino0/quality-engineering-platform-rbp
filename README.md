@@ -8,8 +8,8 @@ executado localmente em Docker a partir de um commit fixo.
 
 [![Regressão completa](https://github.com/MarcosQuintino0/quality-engineering-platform-rbp/actions/workflows/main.yml/badge.svg)](https://github.com/MarcosQuintino0/quality-engineering-platform-rbp/actions/workflows/main.yml)
 [![Verificação de pull request](https://github.com/MarcosQuintino0/quality-engineering-platform-rbp/actions/workflows/pull-request.yml/badge.svg)](https://github.com/MarcosQuintino0/quality-engineering-platform-rbp/actions/workflows/pull-request.yml)
-[![Playwright](https://img.shields.io/badge/Playwright-1.49-2EAD33?logo=playwright&logoColor=white)](https://playwright.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7_strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Playwright](https://img.shields.io/badge/Playwright-test_runner-2EAD33?logo=playwright&logoColor=white)](https://playwright.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-modo_estrito-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![k6](https://img.shields.io/badge/k6-performance-7D64FF?logo=k6&logoColor=white)](https://k6.io)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://docs.docker.com/compose/)
 [![Allure](https://img.shields.io/badge/Allure-report-FF6C37)](https://marcosquintino0.github.io/quality-engineering-platform-rbp/)
@@ -114,6 +114,11 @@ Detalhes, diagramas das camadas e da jornada ponta a ponta em
 | Ambiente       | Docker Compose               | Sobe o SUT completo a partir do commit fixado                                             |
 | Relatório      | Allure                       | Histórico entre execuções, publicado no Pages                                             |
 | Qualidade      | ESLint + Prettier            | Verificados no pipeline                                                                   |
+
+As versões exatas de cada dependência estão em `package.json` e
+`package-lock.json`, que são a fonte da verdade. Os badges acima nomeiam as
+ferramentas, e não versões, para não passarem a mentir a cada atualização do
+Dependabot.
 
 **PostgreSQL não é usado.** O SUT usa H2 em memória, e afirmar o contrário no
 README seria falso.

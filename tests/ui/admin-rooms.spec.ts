@@ -2,6 +2,7 @@ import { buildRoom } from '../../framework/factories';
 import { expect, test } from '../../framework/fixtures/test-fixtures';
 import { AdminRoomDetailsPage, AdminRoomsPage } from '../../framework/pages';
 import { esperarStatus } from '../../framework/assertions/api-assertions';
+import { obrigatorio } from '../../framework/assertions/obrigatorio';
 import { rastrear } from '../../framework/reporting/qep';
 
 test.describe('Administracao de quartos pela interface', () => {
@@ -43,8 +44,8 @@ test.describe('Administracao de quartos pela interface', () => {
     const listagem = await clients.rooms.list();
     esperarStatus(listagem, 200, 'listagem de quartos para localizar o criado');
     const criado = listagem.body.rooms.find((item) => item.roomName === quarto.roomName);
-    expect(criado, 'o quarto criado pela interface deveria existir na API').toBeDefined();
-    recursos.track('room', (criado as { roomid: number }).roomid);
+    const naApi = obrigatorio(criado, 'o quarto criado pela interface deveria existir na API');
+    recursos.track('room', naApi.roomid);
   });
 
   test('QEP-020 alteracao feita na interface fica persistida', async ({
@@ -84,6 +85,7 @@ test.describe('Administracao de quartos pela interface', () => {
     paginaAdmin,
     clients,
     adminToken,
+    recursos,
   }) => {
     rastrear({
       id: 'QEP-021',
@@ -95,6 +97,10 @@ test.describe('Administracao de quartos pela interface', () => {
     const criado = await clients.rooms.create(buildRoom(), adminToken);
     esperarStatus(criado, 201, 'preparacao: criacao do quarto via API');
     const roomid = criado.body.roomid;
+
+    // Registrado mesmo sendo o proprio teste que exclui, para que uma falha na
+    // interface nao deixe o quarto para tras.
+    recursos.track('room', roomid);
 
     const rooms = new AdminRoomsPage(paginaAdmin);
     await rooms.abrir();
