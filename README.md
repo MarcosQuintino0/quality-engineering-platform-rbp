@@ -317,6 +317,28 @@ vídeo e log de rede ficam retidos apenas em caso de falha; as asserções de AP
 incluem o corpo da resposta na mensagem; cada cenário declara identificador,
 camada, risco e requisito no relatório.
 
+Todas as evidências abaixo foram produzidas a partir do ambiente em execução,
+por [evidencias] Quarto de demonstracao criado: 523
+[evidencias] Gravando a jornada de reserva.
+[evidencias] Convertendo o video em GIF otimizado.
+[evidencias] GIF gerado: docs/assets/gifs/jornada-de-reserva.gif (920 kB)
+[evidencias] Capturando home.
+[evidencias] Capturando administracao-de-quartos.
+[evidencias] Capturando detalhe-do-quarto.
+[evidencias] Quarto de demonstracao removido.
+[evidencias] Evidencias geradas.. Nenhuma é montada, editada ou simulada.
+
+| Evidência                            | Arquivo                                                                              |
+| ------------------------------------ | ------------------------------------------------------------------------------------ |
+| Pipeline verde no GitHub Actions     | [pipeline-verde.png](docs/assets/screenshots/pipeline-verde.png)                     |
+| Relatório Allure publicado, 30 casos | [allure-publicado.png](docs/assets/screenshots/allure-publicado.png)                 |
+| Resumo do Allure gerado localmente   | [allure-resumo.png](docs/assets/screenshots/allure-resumo.png)                       |
+| Administração de quartos             | [administracao-de-quartos.png](docs/assets/screenshots/administracao-de-quartos.png) |
+| Detalhe de um quarto                 | [detalhe-do-quarto.png](docs/assets/screenshots/detalhe-do-quarto.png)               |
+| Página inicial                       | [home.png](docs/assets/screenshots/home.png)                                         |
+| Saída verbatim do k6 (PERF-001)      | [perf-001-smoke.txt](performance/results/perf-001-smoke.txt)                         |
+| Baseline de performance completa     | [baseline.summary.json](performance/results/baseline.summary.json)                   |
+
 ## Performance
 
 Limites derivados de medição, na ordem correta: primeiro medir, depois definir.

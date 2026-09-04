@@ -1,0 +1,81 @@
+﻿PERF-001 — smoke test
+Executado em: 2026-09-04 02:28
+Ambiente: local, Docker Compose, commit do SUT d36bd3f
+Saida verbatim do k6, sem edicao.
+[run-k6] PERF-001 (smoke) contra http://host.docker.internal
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: /work/performance/smoke/smoke.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 1 max VUs, 10m30s max duration (incl. graceful stop):
+              * default: 30 iterations shared among 1 VUs (maxDuration: 10m0s, gracefulStop: 30s)
+
+
+running (00m01.0s), 1/1 VUs, 4 complete and 0 interrupted iterations
+default   [  13% ] 1 VUs  00m01.0s/10m0s  04/30 shared iters
+
+running (00m02.0s), 1/1 VUs, 9 complete and 0 interrupted iterations
+default   [  30% ] 1 VUs  00m02.0s/10m0s  09/30 shared iters
+
+running (00m03.0s), 1/1 VUs, 14 complete and 0 interrupted iterations
+default   [  47% ] 1 VUs  00m03.0s/10m0s  14/30 shared iters
+
+running (00m04.0s), 1/1 VUs, 19 complete and 0 interrupted iterations
+default   [  63% ] 1 VUs  00m04.0s/10m0s  19/30 shared iters
+
+running (00m05.0s), 1/1 VUs, 24 complete and 0 interrupted iterations
+default   [  80% ] 1 VUs  00m05.0s/10m0s  24/30 shared iters
+
+running (00m06.0s), 1/1 VUs, 29 complete and 0 interrupted iterations
+default   [  97% ] 1 VUs  00m06.0s/10m0s  29/30 shared iters
+
+
+  █ THRESHOLDS 
+
+    checks
+    ✓ 'rate==1' rate=100.00%
+
+    http_req_failed
+    ✓ 'rate==0' rate=0.00%
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 60      9.672055/s
+    checks_succeeded...: 100.00% 60 out of 60
+    checks_failed......: 0.00%   0 out of 60
+
+    ✓ listagem de quartos devolve colecao nao vazia
+    ✓ consulta de disponibilidade responde 200
+
+    HTTP
+    http_req_duration..............: avg=2.65ms   min=1.57ms   med=2.3ms    max=4.51ms   p(90)=3.94ms   p(95)=4.2ms   
+      { expected_response:true }...: avg=2.65ms   min=1.57ms   med=2.3ms    max=4.51ms   p(90)=3.94ms   p(95)=4.2ms   
+    http_req_failed................: 0.00%  0 out of 60
+    http_reqs......................: 60     9.672055/s
+
+    EXECUTION
+    iteration_duration.............: avg=206.73ms min=205.71ms med=206.67ms max=209.05ms p(90)=207.38ms p(95)=207.51ms
+    iterations.....................: 30     4.836028/s
+    vus............................: 1      min=1       max=1
+    vus_max........................: 1      min=1       max=1
+
+    NETWORK
+    data_received..................: 837 kB 135 kB/s
+    data_sent......................: 6.8 kB 1.1 kB/s
+
+
+
+
+running (00m06.2s), 0/1 VUs, 30 complete and 0 interrupted iterations
+default ✓ [ 100% ] 1 VUs  00m06.2s/10m0s  30/30 shared iters
+[run-k6] Resumo bruto em performance/results/raw/smoke-2026-09-04T05-28-43-853Z.json
+
