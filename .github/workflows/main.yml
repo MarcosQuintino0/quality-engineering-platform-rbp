@@ -79,7 +79,7 @@ jobs:
 
       - name: Enviar relatorio para o Pages
         if: always()
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: allure-report
 
