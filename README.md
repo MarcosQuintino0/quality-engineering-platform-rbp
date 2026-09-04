@@ -13,6 +13,7 @@ executado localmente em Docker a partir de um commit fixo.
 [![k6](https://img.shields.io/badge/k6-performance-7D64FF?logo=k6&logoColor=white)](https://k6.io)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://docs.docker.com/compose/)
 [![Allure](https://img.shields.io/badge/Allure-report-FF6C37)](https://marcosquintino0.github.io/quality-engineering-platform-rbp/)
+[![Última release](https://img.shields.io/github/v/release/MarcosQuintino0/quality-engineering-platform-rbp?label=release)](https://github.com/MarcosQuintino0/quality-engineering-platform-rbp/releases/latest)
 [![Licença MIT](https://img.shields.io/badge/licença-MIT-blue)](LICENSE)
 
 ![Jornada de reserva do hóspede, do calendário à confirmação da reserva](docs/assets/gifs/jornada-de-reserva.gif)
